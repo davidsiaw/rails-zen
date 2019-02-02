@@ -1,0 +1,18 @@
+inherit_from: .rubocop_todo.yml
+
+Style/Documentation:
+  Exclude:
+    - 'spec/**/*'
+    - 'Gemfile'
+    - 'Rakefile'
+
+Metrics/LineLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'Gemfile'
+    - 'Rakefile'
+
+Style/MixinUsage:
+  Exclude:
+    - 'bin/setup'
+    - 'bin/update'
