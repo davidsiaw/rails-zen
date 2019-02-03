@@ -2,13 +2,20 @@
 
 require 'grape-swagger'
 
+# The root of the API
 class RootApi < Grape::API
   format :json
   add_swagger_documentation base_path: '/api',
-                            title: 'asdasd API',
+                            info: {
+                              title: 'The API Title',
+                              description: 'A description of the API.',
+                              contact_name: 'Contact name',
+                              contact_email: 'Contact@email.com',
+                              contact_url: 'Contact URL',
+                              license: 'The name of the license.',
+                              license_url: 'www.The-URL-of-the-license.org',
+                              terms_of_service_url: 'termsofservice.com'
+                            },
                             doc_version: '0.0.1',
-                            hide_documentation_path: true,
-                            #endpoint_auth_wrapper: WineBouncer::OAuth2, # This is the middleware for securing the Swagger UI
-                            #swagger_endpoint_guard: 'oauth2 false',     # this is the guard method and scope
-                            token_owner: 'resource_owner'               # This is the method returning the owner of the token
+                            hide_documentation_path: true
 end

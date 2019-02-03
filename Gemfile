@@ -37,8 +37,9 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'grape'
 gem 'grape-swagger'
 gem 'grape-swagger-entity'
-gem 'grape-swagger-representable'
 gem 'grape-swagger-rails'
+gem 'grape-swagger-representable'
+gem 'paper_trail'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -50,7 +51,6 @@ group :test do
 end
 
 group :development do
-
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'web-console', '>= 3.3.0'
