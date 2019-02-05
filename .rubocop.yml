@@ -1,5 +1,12 @@
 inherit_from: .rubocop_todo.yml
 
+AllCops:
+  Exclude:
+    - 'db/migrate/*.rb'
+    - 'db/schema.rb'
+    - 'bin/setup'
+    - 'bin/update'
+
 Style/Documentation:
   Exclude:
     - 'spec/**/*'
@@ -8,12 +15,6 @@ Style/Documentation:
 
 Metrics/LineLength:
   Exclude:
-    - 'db/schema.rb'
     - 'spec/**/*'
     - 'Gemfile'
     - 'Rakefile'
-
-Style/MixinUsage:
-  Exclude:
-    - 'bin/setup'
-    - 'bin/update'
