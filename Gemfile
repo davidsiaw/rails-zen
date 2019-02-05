@@ -41,9 +41,11 @@ gem 'grape-swagger-rails'
 gem 'grape-swagger-representable'
 gem 'paper_trail'
 
+gem 'ar-uuid'
+gem 'ulid-rails', git: 'https://github.com/davidsiaw/ulid-rails'
+
 group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'pry-byebug', platforms: %i[mri mingw x64_mingw]
 end
 
 group :test do
