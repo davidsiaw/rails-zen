@@ -71,6 +71,8 @@ jobs:
   rubocop:
     docker:
       - image: circleci/ruby:2.6-node
+        environment:
+          RAILS_ENV: development
     steps:
       - checkout
       - restore_cache:
