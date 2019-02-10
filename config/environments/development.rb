@@ -62,4 +62,8 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  # Removes the complaints saying 'Cannot render console from 192.168.1.16!
+  # Allowed networks: 127.0.0.1, ::1, 127.0.0.0/127.255.255.255'
+  config.web_console.whiny_requests = false
 end
