@@ -7,6 +7,23 @@ services:
       - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgres
+  redis:
+    image: 'redis:alpine'
+  pgadmin:
+    image: dpage/pgadmin4:4
+    ports:
+      - 5050:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    entrypoint: /entrypoint.sh
+    volumes:
+      - type: bind
+        source: ./pgadmin_servers.json
+        target: /pgadmin4/servers.json
+        read_only: true
+    depends_on:
+      - db
   app:
     build: .
     container_name: app
@@ -17,6 +34,7 @@ services:
       DATABASE_URL: postgres://postgres:postgres@db
     depends_on:
       - db
+      - redis
   app_startup:
     build: .
     environment:
