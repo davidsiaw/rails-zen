@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+  db:
+    image: postgres:alpine
+    container_name: db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+  app:
+    build: .
+    container_name: app
+    command: sh -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db
+    depends_on:
+      - db
+  app_startup:
+    build: .
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db
+    depends_on:
+      - app
+    command: sh -c "rails db:create && rails db:migrate"
+volumes:
+  db_data:
