@@ -1,24 +1,28 @@
-# README
+# Rails Zen
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a skeleton app for writing APIs.
 
-Things you may want to cover:
+## Features
 
-* Ruby version
+- Uses Grape API
+- Provides Swagger UI for viewing your API
+- Has Papertrail
+- IDs default to ULIDs
+- Comes with Redis
+- Comes with Sidekiq
+- Comes with a nice docker compose that sets up a dev environment that you can use immediately
 
-* System dependencies
+## Getting Started
 
-* Configuration
+```
+docker-compose up -d
+```
 
-* Database creation
+View your API at http://localhost:3000/swagger
 
-* Database initialization
+Comes with PGAdmin at http://localhost:5050.
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```
+user: admin@example.com
+pass: admin
+```

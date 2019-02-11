@@ -1,0 +1,35 @@
+---
+# You can configure sidekiq's concurrency like this:
+#:concurrency: 5
+#staging:
+#  :concurrency: 10
+#production:
+#  :concurrency: 20
+#:queues:
+#  - critical
+#  - default
+#  - low
+
+# You can have sidekiq run a job every once in a while like this:
+# https://github.com/moove-it/sidekiq-scheduler
+#:schedule:
+#  CancelAbandonedOrders:
+#    cron: '0 */5 * * * *'   # Runs when second = 0, every 5 minutes
+#
+#  queue_documents_for_indexing:
+#    cron: '0 0 * * * *'   # Runs every hour
+#
+#    # By default the job name will be taken as worker class name.
+#    # If you want to have a different job name and class name, provide the 'class' option
+#    class: QueueDocuments
+#
+#    queue: slow
+#    args: ['*.pdf']
+#    description: "This job queues pdf content for indexing in solr"
+#
+#    # Enable the `metadata` argument which will pass a Hash containing the schedule metadata
+#    # as the last argument of the `perform` method. `false` by default.
+#    include_metadata: true
+#
+#    # Enable / disable a job. All jobs are enabled by default.
+#    enabled: true
