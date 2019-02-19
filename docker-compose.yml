@@ -48,6 +48,8 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:postgres@db
       REDIS_URL: redis://redis:6379/0
+    volumes:
+      - active_storage:/srv/storage
     depends_on:
       - db
       - redis
@@ -60,3 +62,4 @@ services:
     command: sh -c "rails db:create && rails db:migrate"
 volumes:
   db_data:
+  active_storage:
