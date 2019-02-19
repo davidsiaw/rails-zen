@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
-require 'grape-swagger'
-
-# The root of the API
+# The root APIs
+# This is where all metadata should be
 class RootApi < Grape::API
   format :json
 
+  mount MainApi
+
   API_INFO = {
-    base_path: '/api',
+    base_path: '/',
     info: {
       title: 'The API Title',
       description: 'A description of the API.',
@@ -22,18 +23,9 @@ class RootApi < Grape::API
     hide_documentation_path: true
   }.freeze
 
-  # Version 1
-  class V1Api < Grape::API
-    version 'v1', using: :path
-    mount V1::HealthApi
-  end
-
-  mount V1Api
-
   add_swagger_documentation API_INFO
 
-  desc 'Default route'
-  get '/*' do
+  route :any, '*path' do
     status 404
     { error: :not_found }
   end

@@ -14,8 +14,14 @@ Style/Documentation:
     - 'Gemfile'
     - 'Rakefile'
 
+Metrics/BlockLength:
+  Exclude:
+    - 'config/**/*'
+    - 'spec/**/*'
+    
 Metrics/LineLength:
   Exclude:
+    - 'config/**/*'
     - 'spec/**/*'
     - 'Gemfile'
     - 'Rakefile'

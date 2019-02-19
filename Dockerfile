@@ -14,17 +14,17 @@ RUN bundle && \
     addgroup -g ${PGID} srv && \
     adduser -D -u ${PUID} -G srv srv
 
-ADD --chown=srv:srv app /srv/app
-ADD --chown=srv:srv bin /srv/bin
-ADD --chown=srv:srv config /srv/config
-ADD --chown=srv:srv db /srv/db
-ADD --chown=srv:srv lib /srv/lib
 ADD --chown=srv:srv log /srv/log
 ADD --chown=srv:srv public /srv/public
 ADD --chown=srv:srv spec /srv/spec
 ADD --chown=srv:srv storage /srv/storage
 ADD --chown=srv:srv tmp /srv/tmp
 ADD --chown=srv:srv vendor /srv/vendor
+ADD --chown=srv:srv config /srv/config
+ADD --chown=srv:srv lib /srv/lib
+ADD --chown=srv:srv db /srv/db
+ADD --chown=srv:srv bin /srv/bin
+ADD --chown=srv:srv app /srv/app
 
 USER srv
 
