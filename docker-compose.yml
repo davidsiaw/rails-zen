@@ -49,6 +49,7 @@ services:
       DATABASE_URL: postgres://postgres:postgres@db
       REDIS_URL: redis://redis:6379/0
     volumes:
+      - .:/srv
       - active_storage:/srv/storage
     depends_on:
       - db
@@ -59,7 +60,7 @@ services:
       DATABASE_URL: postgres://postgres:postgres@db
     depends_on:
       - app
-    command: sh -c "rails db:create && rails db:migrate"
+    command: sh -c "rails db:create && rails db:migrate && rails db:seed"
 volumes:
   db_data:
   active_storage:
