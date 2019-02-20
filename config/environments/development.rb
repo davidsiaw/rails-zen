@@ -18,6 +18,7 @@ Rails.application.configure do
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
   if ENV['REDIS_URL']
+    config.action_controller.perform_caching = true
     config.cache_store = :redis_cache_store, { url: ENV['REDIS_URL'] }
 
   elsif Rails.root.join('tmp', 'caching-dev.txt').exist?
@@ -59,7 +60,7 @@ Rails.application.configure do
   config.assets.debug = true
 
   # Suppress logger output for asset requests.
-  config.assets.quiet = true
+  config.assets.quiet = false
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
