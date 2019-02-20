@@ -59,7 +59,8 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:postgres@db
     depends_on:
-      - app
+      - db
+      - redis
     command: sh -c "rails db:create && rails db:migrate && rails db:seed"
 volumes:
   db_data:

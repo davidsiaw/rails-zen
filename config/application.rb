@@ -35,5 +35,16 @@ module RailsZen
     config.paths.add File.join('app', 'apis'), glob: File.join('**', '*.rb')
     config.autoload_paths += Dir[Rails.root.join('app', 'apis', '*')]
     config.active_job.queue_adapter = :sidekiq
+
+    # Use default logging formatter so that PID and timestamp are not suppressed.
+    config.log_formatter = ::Logger::Formatter.new
+
+    # Use a different logger for distributed setups.
+    # require 'syslog/logger'
+    # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new
+    # 'app-name')
+    logger           = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger    = ActiveSupport::TaggedLogging.new(logger)
   end
 end
