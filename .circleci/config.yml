@@ -28,21 +28,21 @@ jobs:
       - run:
           name: start stack
           command: |
-            docker-compose up -d
-            docker-compose exec rails bundle exec rails db:create
-            docker-compose exec rails bundle exec rails db:schema:load
+            docker-compose -f .circleci/compose.yml up -d
+            docker-compose -f .circleci/compose.yml exec rails bundle exec rails db:create
+            docker-compose -f .circleci/compose.yml exec rails bundle exec rails db:schema:load
 
       # run tests!
       - run:
           name: run tests
           command: |
             mkdir /tmp/test-results
-            docker-compose exec rails mkdir /tmp/test-results
+            docker-compose -f .circleci/compose.yml exec rails mkdir /tmp/test-results
 
             TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | \
               circleci tests split --split-by=timings)"
 
-            docker-compose exec rails bundle exec rspec \
+            docker-compose -f .circleci/compose.yml exec rails bundle exec rspec \
               --format progress \
               --format RspecJunitFormatter \
               --out /tmp/test-results/rspec.xml \
