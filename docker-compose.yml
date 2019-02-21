@@ -1,5 +1,8 @@
 version: '3.7'
 services:
+  # Rails database
+  # If you wish to clear the database contents simply run
+  # docker-compose down -v
   db:
     image: postgres:alpine
     container_name: db
@@ -7,23 +10,18 @@ services:
       - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgres
+
+  # Redis server
+  # This server is used as a cache for all temporary data
+  # You can of course, make redis have permanent storage, but I
+  # recommend using postgres for that.
   redis:
     image: 'redis:alpine'
-  pgadmin:
-    image: dpage/pgadmin4:4
-    ports:
-      - 5050:80
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    entrypoint: /entrypoint.sh
-    volumes:
-      - type: bind
-        source: ./pgadmin_servers.json
-        target: /pgadmin4/servers.json
-        read_only: true
-    depends_on:
-      - db
+
+  # Sidekiq server
+  # This is the thing that will perform all delayed jobs, sending
+  # emails, do periodic checks etc. I recommend using this to your
+  # advantage to automate schedulable tasks.
   sidekiq:
     build: .
     command: bundle exec sidekiq -C config/sidekiq.yml
@@ -39,22 +37,34 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-  app:
+
+  # Rails server
+  # This is the main server.
+  # You can use rails c too by simply going
+  # docker-compose exec rails rails c
+  # Using this mechanism you can also perform database migrations and rollbacks
+  # docker-compose exec rails rails db:migrate
+  rails:
     build: .
-    container_name: app
+    container_name: rails
     command: sh -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     ports:
       - "3000:3000"
     environment:
       DATABASE_URL: postgres://postgres:postgres@db
       REDIS_URL: redis://redis:6379/0
+      CHROME_HOSTNAME: chrome # Point to the chrome container for testing
     volumes:
       - .:/srv
       - active_storage:/srv/storage
     depends_on:
       - db
       - redis
-  app_startup:
+
+  # Startup script
+  # This container only starts to prepare the database. It will then exit after it is done.
+  # Use db/seed.rb to seed your database for development.
+  rails_startup:
     build: .
     environment:
       DATABASE_URL: postgres://postgres:postgres@db
@@ -62,6 +72,45 @@ services:
       - db
       - redis
     command: sh -c "rails db:create && rails db:migrate && rails db:seed"
+
+  # ****************
+  # Tools
+  # ****************
+  # All the containers described below here are not for production use
+  # but to assist development
+
+  # PGAdmin
+  # Use this to inspect your database and test queries
+  pgadmin:
+    image: dpage/pgadmin4:4
+    ports:
+      - 5050:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    entrypoint: /entrypoint.sh
+    volumes:
+      - type: bind
+        source: ./pgadmin_servers.json
+        target: /pgadmin4/servers.json
+        read_only: true
+    depends_on:
+      - db
+
+  # Selenium Chrome instance
+  # This is used to perform browser testing and also to ensure that
+  # secure parts of the webapp are not inadvertantly open to the public
+  # See the browser specs in /spec/browser.
+  # If you have a VNC client, simply login to port 5900 with the
+  # password: secret
+  chrome:
+    image: selenium/standalone-chrome-debug
+    container_name: chrome
+    ports:
+      - "5900:5900"
 volumes:
   db_data:
   active_storage:
+
+networks:
+  main:

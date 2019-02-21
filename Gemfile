@@ -45,14 +45,18 @@ gem 'ulid-rails', git: 'https://github.com/davidsiaw/ulid-rails'
 
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
-
 group :development, :test do
+  gem 'factory_bot_rails'
   gem 'pry-byebug', platforms: %i[mri mingw x64_mingw]
 end
 
 group :test do
+  gem 'capybara'
+  gem 'chromedriver-helper'
+  gem 'database_cleaner'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
+  gem 'selenium-webdriver'
 end
 
 group :development do
