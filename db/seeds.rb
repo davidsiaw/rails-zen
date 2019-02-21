@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-User.create(
+Admin.create(
   email: 'admin@example.com',
-  password: 'asdasd',
-  admin: true
+  password: 'asdasd'
 )
