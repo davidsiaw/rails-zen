@@ -4,8 +4,8 @@ require 'sidekiq/web'
 require 'sidekiq-scheduler/web'
 
 Rails.application.routes.draw do
-  devise_for :users
-  authenticate :user, ->(u) { u.admin? } do
+  devise_for :admins
+  authenticate :admins do
     mount GrapeSwaggerRails::Engine => '/swagger'
     mount Sidekiq::Web => '/sidekiq'
   end
