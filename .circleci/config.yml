@@ -10,56 +10,46 @@ jobs:
       - image: circleci/ruby:2.6-node
         environment:
           RAILS_ENV: test
-      - image: circleci/postgres
 
     working_directory: ~/repo
 
     steps:
       - checkout
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "Gemfile.lock" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+      - run:
+          name: install docker compose
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+
+      - setup_remote_docker
 
       - run:
-          name: install system libs
+          name: start stack
           command: |
-            sudo apt install -y postgresql-client || true
-
-      - run:
-          name: install dependencies
-          command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
-
-      - save_cache:
-          paths:
-            - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
-
-      # Database setup
-      - run:
-          name: database setup
-          command: |
-            bundle exec rake db:create
-            bundle exec rake db:schema:load
+            docker-compose -f .circleci/compose.yml up -d
+            docker-compose -f .circleci/compose.yml exec rails bundle exec rails db:create
+            docker-compose -f .circleci/compose.yml exec rails bundle exec rails db:schema:load
 
       # run tests!
       - run:
           name: run tests
           command: |
             mkdir /tmp/test-results
+            docker-compose -f .circleci/compose.yml exec rails mkdir /tmp/test-results
+
             TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | \
               circleci tests split --split-by=timings)"
 
-            bundle exec rspec \
+            docker-compose -f .circleci/compose.yml exec rails bundle exec rspec \
               --format progress \
               --format RspecJunitFormatter \
               --out /tmp/test-results/rspec.xml \
               --format progress \
               $TEST_FILES
+
+            docker cp rails:/tmp/test-results/rspec.xml /tmp/test-results/rspec.xml
 
       # collect reports
       - store_test_results:
