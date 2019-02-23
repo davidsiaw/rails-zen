@@ -91,4 +91,8 @@ workflows:
     jobs:
       - build
       - rubocop
-      - danger
+      - danger:
+          filters:
+            branches:
+              ignore:
+                - master
