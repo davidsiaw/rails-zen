@@ -45,7 +45,9 @@ gem 'ulid-rails', git: 'https://github.com/davidsiaw/ulid-rails'
 
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
+
 group :development, :test do
+  gem 'danger'
   gem 'factory_bot_rails'
   gem 'pry-byebug', platforms: %i[mri mingw x64_mingw]
 end
