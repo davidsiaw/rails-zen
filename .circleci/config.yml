@@ -71,9 +71,24 @@ jobs:
             gem install rubocop
       - run: rubocop
 
+  danger:
+    docker:
+      - image: circleci/ruby:2.6-node
+        environment:
+          RAILS_ENV: development
+    steps:
+      - checkout
+      - run:
+          name: install rubocop
+          command: |
+            gem install danger
+            danger --version
+      - run: danger --verbose
+
 workflows:
   version: 2
   build:
     jobs:
       - build
       - rubocop
+      - danger
