@@ -18,10 +18,14 @@ Metrics/BlockLength:
   Exclude:
     - 'config/**/*'
     - 'spec/**/*'
-    
+
 Metrics/LineLength:
   Exclude:
     - 'config/**/*'
     - 'spec/**/*'
     - 'Gemfile'
     - 'Rakefile'
+
+Style/SignalException:
+  Exclude:
+    - 'Dangerfile'
