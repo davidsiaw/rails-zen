@@ -58,7 +58,7 @@ unless github.api.organization_member?('bunnylabs', github.pr_author)
   modified_important_files = git.modified_files & important_files
   unless modified_important_files.empty?
     warn <<~WARNING
-      External contributor has edited these files: #{modified_important_files.to_a.inspect}"
+      External contributor has edited these files: #{modified_important_files.to_a.join(', ')}
     WARNING
   end
 end
