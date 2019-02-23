@@ -50,13 +50,13 @@ group :development, :test do
   gem 'danger'
   gem 'factory_bot_rails'
   gem 'pry-byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'rspec-rails'
 end
 
 group :test do
   gem 'capybara'
   gem 'chromedriver-helper'
   gem 'database_cleaner'
-  gem 'rspec-rails'
   gem 'rspec_junit_formatter'
   gem 'selenium-webdriver'
 end
