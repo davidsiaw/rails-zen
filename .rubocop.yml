@@ -7,6 +7,7 @@ AllCops:
     - 'db/schema.rb'
     - 'bin/setup'
     - 'bin/update'
+    - 'lib/templates/**/*'
 
 Style/Documentation:
   Exclude:
