@@ -59,6 +59,7 @@ group :test do
   gem 'database_cleaner'
   gem 'rspec_junit_formatter'
   gem 'selenium-webdriver'
+  gem 'shoulda-matchers'
 end
 
 group :development do
