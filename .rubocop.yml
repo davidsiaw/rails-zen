@@ -16,6 +16,7 @@ Style/Documentation:
 
 Metrics/BlockLength:
   Exclude:
+    - 'app/apis/**/*'
     - 'config/**/*'
     - 'spec/**/*'
 
