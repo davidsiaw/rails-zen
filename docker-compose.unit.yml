@@ -1,0 +1,55 @@
+version: '3.7'
+services:
+  rz:
+    build:
+      context: .
+      dockerfile: docker/unit/Dockerfile
+    container_name: rz
+    volumes:
+      - type: bind
+        source: ./docker/unit/postgresql.conf
+        target: /srv/postgres/postgresql.conf
+        read_only: true
+      - type: bind
+        source: ./docker/unit/pg_hba.conf
+        target: /srv/postgres/pg_hba.conf
+        read_only: true
+    ports:
+      - "3000:3000"
+      - "5432"
+
+  # ****************
+  # Tools
+  # ****************
+  # All the containers described below here are not for production use
+  # but to assist development
+
+  # PGAdmin
+  # Use this to inspect your database and test queries
+  pgadmin:
+    image: dpage/pgadmin4:4
+    ports:
+      - 5050:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    entrypoint: /entrypoint.sh
+    volumes:
+      - type: bind
+        source: ./docker/unit/pgadmin_servers.json
+        target: /pgadmin4/servers.json
+        read_only: true
+    depends_on:
+      - rz
+
+  # Selenium Chrome instance
+  # This is used to perform browser testing and also to ensure that
+  # secure parts of the webapp are not inadvertantly open to the public
+  # See the browser specs in /spec/browser.
+  # If you have a VNC client, simply login to port 5900 with the
+  # password: secret
+  chrome:
+    image: selenium/standalone-chrome-debug
+    container_name: chrome
+    ports:
+      - "5900:5900"

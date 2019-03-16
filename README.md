@@ -39,3 +39,11 @@ Comes with PGAdmin at http://localhost:5050.
 user: admin@example.com
 pass: admin
 ```
+
+## Unit container
+
+Rails Zen also runs inside a single container where redis and postgres also run.
+
+```
+docker-compose -f docker-compose.unit.yml up -d # Start
+```
