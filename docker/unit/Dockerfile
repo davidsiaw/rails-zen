@@ -44,7 +44,6 @@ RUN mkdir postgres && \
 
 VOLUME /srv/postgres
 
-
 EXPOSE 3000
 
 ENV RAILS_ENV=development
