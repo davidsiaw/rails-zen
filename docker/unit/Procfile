@@ -1,4 +1,4 @@
 postgres: postgres -D /srv/postgres
 redis: redis-server
-rails: sh waitpg.sh; rails db:create; rails db:migrate; rails db:seed; sh waitredis.sh; bundle exec rails s -b 0.0.0.0 -p 3000
+rails: rails assets:precompile; sh waitpg.sh; rails db:create; rails db:migrate; rails db:seed; sh waitredis.sh; bundle exec rails s -b 0.0.0.0 -p 3000
 sidekiq: sh waitpg.sh && sh waitredis.sh && bundle exec sidekiq -C config/sidekiq.yml
