@@ -6,14 +6,9 @@ services:
       dockerfile: docker/unit/Dockerfile
     container_name: rz
     volumes:
-      - type: bind
-        source: ./docker/unit/postgresql.conf
-        target: /srv/postgres/postgresql.conf
-        read_only: true
-      - type: bind
-        source: ./docker/unit/pg_hba.conf
-        target: /srv/postgres/pg_hba.conf
-        read_only: true
+      - ./docker/unit/postgresql.conf:/srv/postgres/postgresql.conf:ro
+      - ./docker/unit/pg_hba.conf:/srv/postgres/pg_hba.conf:ro
+      - db_data:/srv/postgresql
     ports:
       - "3000:3000"
       - "5432"
@@ -53,3 +48,5 @@ services:
     container_name: chrome
     ports:
       - "5900:5900"
+volumes:
+  db_data:
