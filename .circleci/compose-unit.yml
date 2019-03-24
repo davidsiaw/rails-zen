@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  # Unit server
+  rails-unit:
+    build:
+      context: ..
+      dockerfile: ./docker/unit/Dockerfile
+    container_name: rails-unit
+    environment:
+      TEST_HOST: rails-unit
+      CHROME_HOSTNAME: chrome # Point to the chrome container for testing
+
+  # Selenium Chrome instance
+  # This is used to perform browser testing and also to ensure that
+  # secure parts of the webapp are not inadvertantly open to the public
+  # See the browser specs in /spec/browser.
+  # If you have a VNC client, simply login to port 5900 with the
+  # password: secret
+  chrome:
+    image: selenium/standalone-chrome
+    container_name: chrome
+volumes:
+  db_data:
+  active_storage:

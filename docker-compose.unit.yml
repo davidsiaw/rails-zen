@@ -9,6 +9,12 @@ services:
       - ./docker/unit/postgresql.conf:/srv/postgres/postgresql.conf:ro
       - ./docker/unit/pg_hba.conf:/srv/postgres/pg_hba.conf:ro
       - db_data:/srv/postgresql
+      - ./app:/srv/app
+      - ./config:/srv/config
+      - ./db:/srv/db
+      - ./lib:/srv/lib
+      - ./spec:/srv/spec
+      - ./Gemfile:/srv/Gemfile
     ports:
       - "3000:3000"
       - "5432"
