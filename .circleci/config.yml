@@ -65,6 +65,67 @@ jobs:
           path: /tmp/test-results
           destination: test-results
 
+  build-unit:
+    docker:
+      # specify the version you desire here
+      - image: circleci/ruby:2.6-node
+        environment:
+          RAILS_ENV: test
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: install docker compose
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+
+      - setup_remote_docker
+
+      - run:
+          name: start stack
+          command: |
+            docker-compose -f .circleci/compose-unit.yml up -d
+
+      # run tests!
+      - run:
+          name: prepare test container
+          command: |
+            mkdir -p /tmp/test-results
+            docker-compose -f .circleci/compose-unit.yml exec rails-unit mkdir /tmp/test-results
+
+      - run:
+          name: wait for container to ready
+          command : |
+            bash -c 'while [[ "$(docker-compose -f .circleci/compose-unit.yml exec rails-unit curl -s -o /dev/null -w ''%{http_code}'' http://localhost:3000/api/v1/health)" != "200" ]]; do sleep 1; printf "."; done'
+
+      - run:
+          name: run tests
+          command: |
+            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | \
+              circleci tests split --split-by=timings)"
+
+            docker-compose -f .circleci/compose-unit.yml exec rails-unit bundle exec rspec \
+              --format progress \
+              --format RspecJunitFormatter \
+              --out /tmp/test-results/rspec.xml \
+              --format progress \
+              $TEST_FILES
+
+      - run:
+          name: extract results
+          when: always
+          command: |
+            docker cp rails-unit:/tmp/test-results/rspec.xml /tmp/test-results/rspec.xml
+
+      # collect reports
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
+
   rubocop:
     docker:
       - image: circleci/ruby:2.6-node
@@ -97,6 +158,7 @@ workflows:
   build:
     jobs:
       - build
+      - build-unit
       - rubocop
       - danger:
           filters:
