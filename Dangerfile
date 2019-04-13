@@ -64,10 +64,10 @@ begin
       WARNING
     end
   end
-rescue URI::InvalidURIError => error
+rescue URI::InvalidURIError => e
   warn <<~WARNING
     External contributor with hidden fork or inaccessible fork
-    #{error}
+    #{e}
   WARNING
 end
 
