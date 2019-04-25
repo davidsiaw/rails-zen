@@ -6,16 +6,20 @@ This skeleton allows you to achieve zen
 
 ## Features
 
-- Uses Grape API
-- Provides Swagger UI for viewing your API
-- Has Papertrail
-- IDs default to ULIDs
-- Comes with Redis
-- Comes with Sidekiq
-- Comes with a nice docker compose that sets up a dev environment that you can use immediately
-- Devise for swagger and sidekiq dashboards (and everything else you want)
-- Pre-prepared browser test suite
-- Constantly updates dependencies
+|   | Feature           |
+|---|-------------------|
+| [![Gitlab pipeline status](https://img.shields.io/gitlab/pipeline/davidsiaw/rails-zen.svg?label=gitlab)](https://gitlab.com/davidsiaw/rails-zen/pipelines)  | Comes with default Gitlab CI Configuration  |
+| [![CircleCI branch](https://img.shields.io/circleci/project/github/davidsiaw/rails-zen/master.svg?label=circleci)](https://circleci.com/gh/davidsiaw/rails-zen/tree/master)  | Comes with default Circle CI Configuration   |
+|   | Uses Grape API    |
+|   | Provides Swagger UI for viewing your API  |
+|   | Has Papertrail  |
+|   | IDs default to ULIDs  |
+|   | Comes with Redis  |
+|   | Comes with Sidekiq  |
+|   | Comes with a nice docker compose that sets up a dev environment that you can use immediately  |
+|   | Devise for swagger and sidekiq dashboards (and everything else you want)  |
+|   | Pre-prepared browser test suite  |
+| ![Dependabot](https://img.shields.io/badge/dependabot-active-brightgreen.svg)  | Constantly updates dependencies  |
 
 ## Getting Started
 
