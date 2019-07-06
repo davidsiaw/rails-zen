@@ -33,6 +33,8 @@ gem 'bcrypt', '~> 3.1.13'
 gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'devise'
+gem 'faker'
+gem 'ffaker'
 gem 'grape'
 gem 'grape-swagger'
 gem 'grape-swagger-entity'
