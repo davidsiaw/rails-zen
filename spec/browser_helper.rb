@@ -19,6 +19,7 @@ else
     Capybara::Selenium::Driver.new(app, browser: :chrome)
   end
 end
+Capybara.server = :puma, { Silent: true }
 
 Capybara.configure do |config|
   config.default_max_wait_time = 10 # seconds
