@@ -1,1 +1,1 @@
-timeout sh -c 'until nc -z $0 $1; do sleep 1; echo "Waiting for Postgres"; done' localhost 5432; 
+timeout 10 sh -c 'until nc -z $0 $1; do sleep 1; echo "Waiting for Postgres"; done' localhost 5432; 
