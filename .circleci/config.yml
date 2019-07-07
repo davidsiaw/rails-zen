@@ -139,6 +139,7 @@ jobs:
         environment:
           RAILS_ENV: test
     steps:
+      - setup_remote_docker
       - run:
           name: pull minazuki
           command: |
