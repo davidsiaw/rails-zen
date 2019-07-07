@@ -147,22 +147,25 @@ jobs:
       - run:
           name: generate server
           command: |
-            REPO='--single-branch --branch $CIRCLE_BRANCH https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME'
+            cd minazuki
+            REPO='--single-branch --branch $CIRCLE_BRANCH https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME' ruby main.rb
 
       - run:
           name: wait for server
           command: |
+            cd minazuki
             docker ps -a
             timeout 60 bash -c -- 'while [[ "$(docker-compose -f rails-zen/.circleci/compose-unit.yml exec rails-unit curl -s -o /dev/null -w ''%{http_code}'' http://localhost:3000/api/v1/health)" != "200" ]]; do sleep 1; printf "."; done'
 
       - run:
           name: display docker log for failed container start
-          command: docker-compose -f rails-zen/.circleci/compose-unit.yml logs rails-unit
+          command: docker-compose -f minazuki/rails-zen/.circleci/compose-unit.yml logs rails-unit
           when: on_fail
 
       - run:
           name: run tests
           command: |
+            cd minazuki
             TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | \
               circleci tests split --split-by=timings)"
 
