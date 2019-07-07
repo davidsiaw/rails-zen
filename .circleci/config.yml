@@ -182,7 +182,15 @@ jobs:
           name: extract results
           when: always
           command: |
+            mkdir -p /tmp/test-results
             docker cp rails-unit:/tmp/test-results/rspec.xml /tmp/test-results/rspec.xml
+
+      # collect reports
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
 
   rubocop:
     docker:
