@@ -212,6 +212,7 @@ workflows:
     jobs:
       - build
       - build-unit
+      - test-real
       - rubocop
       - danger:
           filters:
