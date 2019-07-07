@@ -132,6 +132,53 @@ jobs:
           path: /tmp/test-results
           destination: test-results
 
+  test-real:
+    docker:
+      # specify the version you desire here
+      - image: circleci/ruby:2.6-node
+        environment:
+          RAILS_ENV: test
+    steps:
+      - run:
+          name: pull minazuki
+          command: |
+            git checkout https://github.com/davidsiaw/minazuki
+
+      - run:
+          name: generate server
+          command: |
+            REPO='--single-branch --branch $CIRCLE_BRANCH https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME'
+
+      - run:
+          name: wait for server
+          command: |
+            docker ps -a
+            timeout 60 bash -c -- 'while [[ "$(docker-compose -f rails-zen/.circleci/compose-unit.yml exec rails-unit curl -s -o /dev/null -w ''%{http_code}'' http://localhost:3000/api/v1/health)" != "200" ]]; do sleep 1; printf "."; done'
+
+      - run:
+          name: display docker log for failed container start
+          command: docker-compose -f rails-zen/.circleci/compose-unit.yml logs rails-unit
+          when: on_fail
+
+      - run:
+          name: run tests
+          command: |
+            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | \
+              circleci tests split --split-by=timings)"
+
+            docker-compose -f rails-zen/.circleci/compose-unit.yml exec rails-unit bundle exec rspec \
+              --format progress \
+              --format RspecJunitFormatter \
+              --out /tmp/test-results/rspec.xml \
+              --format progress \
+              $TEST_FILES
+
+      - run:
+          name: extract results
+          when: always
+          command: |
+            docker cp rails-unit:/tmp/test-results/rspec.xml /tmp/test-results/rspec.xml
+
   rubocop:
     docker:
       - image: circleci/ruby:2.6-node
