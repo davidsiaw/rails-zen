@@ -142,7 +142,7 @@ jobs:
       - run:
           name: pull minazuki
           command: |
-            git checkout https://github.com/davidsiaw/minazuki
+            git clone https://github.com/davidsiaw/minazuki
 
       - run:
           name: generate server
