@@ -148,6 +148,7 @@ jobs:
           name: generate server
           command: |
             cd minazuki
+            bundle install
             REPO='--single-branch --branch $CIRCLE_BRANCH https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME' ruby main.rb
 
       - run:
