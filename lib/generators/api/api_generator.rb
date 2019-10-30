@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # Api Generator
+# rubocop:disable Metrics/ClassLength
 class ApiGenerator < Rails::Generators::Base
   source_root File.expand_path('templates', __dir__)
   argument :resource_name, type: :string
@@ -33,20 +34,25 @@ class ApiGenerator < Rails::Generators::Base
   end
 
   def basic_types
-    %w[
-      string
-      integer
-      boolean
-    ]
+    %w[string integer boolean]
+  end
+
+  def ptype_of(tokens)
+    basic_types.include?(tokens[1]) ? tokens[1] : 'string'
+  end
+
+  def pname_of(tokens)
+    basic_types.include?(tokens[1]) ? tokens[0] : "#{tokens[0]}_id"
   end
 
   def fields
     @fields ||= member_list.map do |member|
       tokens = member.split(':')
-      ptype = basic_types.include?(tokens[1]) ? tokens[1] : 'string'
-      pname = basic_types.include?(tokens[1]) ? tokens[0] : "#{tokens[0]}_id"
-      ftype = tokens[1]
-      [tokens[0], { param_name: pname, param_type: ptype, full_type: ftype }]
+      [tokens[0], {
+        param_name: pname_of(tokens),
+        param_type: ptype_of(tokens),
+        full_type: tokens[1]
+      }]
     end.to_h
   end
 
@@ -134,3 +140,4 @@ class ApiGenerator < Rails::Generators::Base
     File.open(main_api_path, 'wb') { |file| file.write(result) }
   end
 end
+# rubocop:enable Metrics/ClassLength
