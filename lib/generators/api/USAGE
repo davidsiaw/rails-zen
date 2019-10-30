@@ -1,0 +1,16 @@
+Description:
+    Generate an API Resource
+
+Example:
+    rails generate api song name:string length_seconds:integer
+
+    This will create: (note resource names are automatically pluralized)
+        app/apis/v1/songs_api.rb
+
+    Go to http://localhost:3000 to view the newly created API
+
+Supported types are:
+    - integer
+    - string
+    - boolean
+    - <another resource name>

@@ -1,0 +1,23 @@
+# frozen_string_literal: true
+
+module V1
+  # Endpoint to access <%= resource_name_plural %>
+  class <%= class_name %> < Grape::API
+    resource :<%= resource_name_plural %> do
+      desc 'Retrieve <%= resource_name_plural %>'
+      get do
+      end
+
+      desc 'Retrieve a <%= resource_name_singular %>'
+      get :id do
+      end
+
+      desc 'Create a <%= resource_name_singular %>'
+      params do
+
+      end
+      post do
+      end
+    end
+  end
+end
