@@ -11,6 +11,7 @@ class ApiGenerator < Rails::Generators::Base
 
   def generate_init
     generate_api
+    generate_api_tests
 
     if behavior == :invoke
       mount_api
@@ -53,6 +54,11 @@ class ApiGenerator < Rails::Generators::Base
 
   def generate_api
     template 'api_template.rb.erb', "app/apis/v1/#{resource_name_plural}_api.rb"
+  end
+
+  def generate_api_tests
+    template 'api_spec_template.rb.erb',
+             "spec/apis/v1/#{resource_name_plural}_api_spec.rb"
   end
 
   def destination_path(path)

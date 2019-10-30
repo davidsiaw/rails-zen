@@ -14,7 +14,7 @@ module V1
       params do
         requires :id, type: String, desc: 'Id of the <%= resource_name_singular %>'
       end
-      get :id do
+      get ':id' do
         # Return your <%= resource_name_singular %> here
         { result: :ok }
       end
@@ -38,7 +38,7 @@ module V1
         requires :<%= field_info[:param_name] %>, type: <%= field_info[:param_type].camelize %>, desc: 'The <%= resource_name_singular %> <%= field_name %>'
         <%- end -%>
       end
-      put :id do
+      put ':id' do
         # Create a <%= resource_name_singular %> here
         status 201
         { result: :ok }
@@ -48,7 +48,7 @@ module V1
       params do
         requires :id, type: String, desc: 'Id of the <%= resource_name_singular %>'
       end
-      delete :id do
+      delete ':id' do
         # Delete the <%= resource_name_singular %> here
         status 204
       end
