@@ -6,17 +6,51 @@ module V1
     resource :<%= resource_name_plural %> do
       desc 'Retrieve <%= resource_name_plural %>'
       get do
+        # Return your <%= resource_name_plural %> here
+        { result: :ok }
       end
 
       desc 'Retrieve a <%= resource_name_singular %>'
+      params do
+        requires :id, type: String, desc: 'Id of the <%= resource_name_singular %>'
+      end
       get :id do
+        # Return your <%= resource_name_singular %> here
+        { result: :ok }
       end
 
       desc 'Create a <%= resource_name_singular %>'
       params do
-
+        <%- fields.each do |field_name, field_info| -%>
+        requires :<%= field_info[:param_name] %>, type: <%= field_info[:param_type].camelize %>, desc: 'The <%= resource_name_singular %> <%= field_name %>'
+        <%- end -%>
       end
       post do
+        # Create a <%= resource_name_singular %> here
+        status 201
+        { result: :ok }
+      end
+
+      desc 'Assign a <%= resource_name_singular %>'
+      params do
+        requires :id, type: String, desc: 'Id of the <%= resource_name_singular %>'
+        <%- fields.each do |field_name, field_info| -%>
+        requires :<%= field_info[:param_name] %>, type: <%= field_info[:param_type].camelize %>, desc: 'The <%= resource_name_singular %> <%= field_name %>'
+        <%- end -%>
+      end
+      put :id do
+        # Create a <%= resource_name_singular %> here
+        status 201
+        { result: :ok }
+      end
+
+      desc 'Delete a <%= resource_name_singular %>'
+      params do
+        requires :id, type: String, desc: 'Id of the <%= resource_name_singular %>'
+      end
+      delete :id do
+        # Delete the <%= resource_name_singular %> here
+        status 204
       end
     end
   end

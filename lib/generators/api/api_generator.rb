@@ -31,10 +31,21 @@ class ApiGenerator < Rails::Generators::Base
     resource_name_plural.camelize + 'Api'
   end
 
+  def basic_types
+    %w[
+      string
+      integer
+      boolean
+    ]
+  end
+
   def fields
     @fields ||= member_list.map do |member|
       tokens = member.split(':')
-      [tokens[0], { type: tokens[1] }]
+      ptype = basic_types.include?(tokens[1]) ? tokens[1] : 'string'
+      pname = basic_types.include?(tokens[1]) ? tokens[0] : "#{tokens[0]}_id"
+      ftype = tokens[1]
+      [tokens[0], { param_name: pname, param_type: ptype, full_type: ftype }]
     end.to_h
   end
 
