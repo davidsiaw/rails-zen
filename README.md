@@ -23,19 +23,46 @@ This skeleton allows you to achieve zen
 
 ## Getting Started
 
+Rails Zen comes with a set of useful bash scripts for happy debugging
+
 ```
-docker-compose up -d   # Start stack
+bin/start              # Start the dev stack
 ```
 
 ```
-docker-compose down -v # Shutdown stack
+bin/stop               # Shutdown the dev stack
 ```
 
 ```
-docker-compose exec rails rspec # Run tests
+bin/close              # Stop the devstack and delete everything
 ```
+
+```
+bin/test               # Run tests
+```
+
+```
+bin/watch              # Watch the logs
+```
+
+```
+bin/attach             # Attach to rails for debugging with binding.pry
+```
+
+```
+bin/shell              # Shell into the rails container
+```
+
+## Where's my API at
 
 View your API at http://localhost:3000/swagger
+
+```
+user: admin@example.com
+pass: asdasd
+```
+
+## How to edit database
 
 Comes with PGAdmin at http://localhost:5050.
 
