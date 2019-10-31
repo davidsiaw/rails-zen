@@ -78,3 +78,13 @@ Rails Zen also runs inside a single container where redis and postgres also run.
 ```
 docker-compose -f docker-compose.unit.yml up -d # Start
 ```
+
+## My project is not called Rails Zen
+
+There is a script that renames your application and database classes called `bin/rename`
+
+Simply use that script to rename your project to whatever you like!
+
+```
+bin/rename hello_trains
+```
