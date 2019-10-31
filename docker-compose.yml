@@ -60,6 +60,8 @@ services:
     depends_on:
       - db
       - redis
+    stdin_open: true
+    tty: true
 
   # Startup script
   # This container only starts to prepare the database. It will then exit after it is done.
