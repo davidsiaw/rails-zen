@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# This file renames the project from rails_zen to something else.
+
+require 'active_support/inflector'
+
+dest_name = ARGV[0]
+
+if dest_name.nil?
+  puts 'Renames the project from rails_zen to something else'
+  puts 'USAGE: bin/rename my_application'
+  exit(1)
+end
+
+underscore = dest_name.underscore
+camelized = dest_name.camelize
+
+unless dest_name =~ /^[a-z][a-z0-9_]+$/
+  puts 'Please use a name that only consists of letters and underscores'
+  exit(1)
+end
+
+(Dir['./**/*.*'] + Dir['./**/*']).each do |file|
+  next if File.directory?(file)
+
+  contents = File.read(file)
+  orig = contents.clone
+  contents.gsub!('rails_zen', underscore)
+  contents.gsub!('RailsZen', camelized)
+  File.write(file, contents)
+  puts "Renamed #{file}" if orig != contents
+rescue StandardError => e
+  puts "Could not rename in #{file}: #{e.message}"
+end
