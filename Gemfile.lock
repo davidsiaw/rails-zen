@@ -83,7 +83,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.4.5)
       msgpack (~> 1.0)
-    builder (3.2.3)
+    builder (3.2.4)
     byebug (11.0.0)
     capybara (3.29.0)
       addressable
@@ -160,7 +160,7 @@ GEM
     git (1.5.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
-    grape (1.2.4)
+    grape (1.2.5)
       activesupport
       builder
       mustermann-grape (~> 1.0.0)
@@ -237,7 +237,7 @@ GEM
     puma (4.3.1)
       nio4r (~> 2.0)
     raabro (1.1.6)
-    rack (2.0.7)
+    rack (2.0.8)
     rack-accept (0.4.5)
       rack (>= 0.4)
     rack-protection (2.0.7)
@@ -386,7 +386,7 @@ GEM
     websocket-extensions (0.1.4)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.2.1)
+    zeitwerk (2.2.2)
 
 PLATFORMS
   ruby
