@@ -197,8 +197,8 @@ GEM
       concurrent-ruby (~> 1.0)
     io-like (0.3.0)
     jaro_winkler (1.5.4)
-    jbuilder (2.9.1)
-      activesupport (>= 4.2.0)
+    jbuilder (2.10.0)
+      activesupport (>= 5.0.0)
     kramdown (2.1.0)
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
@@ -419,7 +419,7 @@ DEPENDENCIES
   grape-swagger-entity
   grape-swagger-rails
   grape-swagger-representable
-  jbuilder (~> 2.9)
+  jbuilder (~> 2.10)
   listen (>= 3.0.5, < 3.3)
   paper_trail
   pg (>= 0.18, < 2.0)
