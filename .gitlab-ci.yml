@@ -30,10 +30,10 @@ rubocop:
   tags:
     - ruby
   before_script:
-  - apk --update add build-base git
-  - gem install rubocop
+    - apk --update add build-base git
+    - gem install rubocop
   script:
-  - rubocop
+    - rubocop
 
 test:
   services:
@@ -47,7 +47,7 @@ test:
     REDIS_URL: redis://redis:6379/0
     CHROME_HOSTNAME: selenium-standalone-chrome
   script:
-  - bundle exec rails db:create
-  - bundle exec rails db:migrate
-  - echo "$(cat /etc/hosts | grep -Eo "^([0-9\.]+)\s+runner-[0-9a-zA-Z]*-+project-[0-9a-zA-Z]+-concurrent-[0-9]+" | grep -Eo "^([0-9\.]+)")" > ip_addr
-  - TEST_HOST="$(cat ip_addr)" bundle exec rspec
+    - bundle exec rails db:create
+    - bundle exec rails db:migrate
+    - echo "$(cat /etc/hosts | grep -Eo "^([0-9\.]+)\s+runner-[0-9a-zA-Z]*-+project-[0-9a-zA-Z]+-concurrent-[0-9]+" | grep -Eo "^([0-9\.]+)")" > ip_addr
+    - TEST_HOST="$(cat ip_addr)" bundle exec rspec
