@@ -75,7 +75,7 @@ GEM
       io-like (~> 0.3.0)
     ast (2.4.1)
     base32-crockford (0.1.0)
-    bcrypt (3.1.13)
+    bcrypt (3.1.14)
     bindex (0.8.1)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
@@ -414,7 +414,7 @@ PLATFORMS
 
 DEPENDENCIES
   ar-uuid
-  bcrypt (~> 3.1.13)
+  bcrypt (~> 3.1.14)
   bootsnap (>= 1.1.0)
   capybara
   chromedriver-helper
