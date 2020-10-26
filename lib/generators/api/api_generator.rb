@@ -14,9 +14,10 @@ class ApiGenerator < Rails::Generators::Base
     generate_api
     generate_api_tests
 
-    if behavior == :invoke
+    case behavior
+    when :invoke
       mount_api
-    elsif behavior == :revoke
+    when :revoke
       unmount_api
     end
   end
@@ -30,7 +31,7 @@ class ApiGenerator < Rails::Generators::Base
   end
 
   def class_name
-    resource_name_plural.camelize + 'Api'
+    "#{resource_name_plural.camelize}Api"
   end
 
   def basic_types
@@ -89,12 +90,12 @@ class ApiGenerator < Rails::Generators::Base
       content_lines = File.read(main_api_path).split("\n")
 
       idx_start = idxof(content_lines, /^\s+mount V1::HealthApi$/)
-      idx_end = idxof(content_lines[idx_start..-1], /^(\s+)end$/) + idx_start
+      idx_end = idxof(content_lines[idx_start..], /^(\s+)end$/) + idx_start
 
       {
         start: content_lines[0...idx_start],
         list: content_lines[idx_start...idx_end],
-        end: content_lines[idx_end..-1]
+        end: content_lines[idx_end..]
       }
     end
   end
@@ -125,7 +126,7 @@ class ApiGenerator < Rails::Generators::Base
     result = [mount_start,
               mount_list,
               "    #{mount_statement}",
-              mount_end].join("\n") + "\n"
+              mount_end].map { |x| "#{x}\n" }
 
     File.open(main_api_path, 'wb') { |file| file.write(result) }
   end
@@ -135,7 +136,7 @@ class ApiGenerator < Rails::Generators::Base
 
     result = [mount_start,
               mount_list_sans_statement,
-              mount_end].join("\n") + "\n"
+              mount_end].map { |x| "#{x}\n" }
 
     File.open(main_api_path, 'wb') { |file| file.write(result) }
   end
