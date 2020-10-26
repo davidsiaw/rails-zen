@@ -47,7 +47,7 @@ module RailsZen
     # require 'syslog/logger'
     # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new
     # 'app-name')
-    logger           = ActiveSupport::Logger.new(STDOUT)
+    logger           = ActiveSupport::Logger.new($stdout)
     logger.formatter = config.log_formatter
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
   end
