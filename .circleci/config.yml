@@ -173,6 +173,7 @@ jobs:
             TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | \
               circleci tests split --split-by=timings)"
 
+            docker-compose -f rails-zen/.circleci/compose-unit.yml exec rails-unit bundle exec rails db:test:prepare 
             docker-compose -f rails-zen/.circleci/compose-unit.yml exec rails-unit bundle exec rspec \
               --format progress \
               --format RspecJunitFormatter \
