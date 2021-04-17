@@ -43,4 +43,5 @@ jobs:
           bundle install -j $(nproc) --path vendor
           bundle exec rails db:create
           bundle exec rails db:migrate
+          bundle exec rails db:test:prepare
           TEST_HOST="$(hostname -i)" bundle exec rspec

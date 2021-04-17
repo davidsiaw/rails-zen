@@ -38,6 +38,7 @@ jobs:
           command: |
             mkdir -p /tmp/test-results
             docker-compose -f .circleci/compose.yml exec rails mkdir /tmp/test-results
+            docker-compose -f .circleci/compose.yml exec rails rails db:test:prepare 
 
       - run:
           name: run tests
@@ -94,6 +95,7 @@ jobs:
           command: |
             mkdir -p /tmp/test-results
             docker-compose -f .circleci/compose-unit.yml exec rails-unit mkdir /tmp/test-results
+            docker-compose -f .circleci/compose-unit.yml exec rails-unit rails db:test:prepare 
 
       - run:
           name: wait for container to ready
@@ -171,6 +173,7 @@ jobs:
             TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | \
               circleci tests split --split-by=timings)"
 
+            docker-compose -f rails-zen/.circleci/compose-unit.yml exec rails-unit bundle exec rails db:test:prepare 
             docker-compose -f rails-zen/.circleci/compose-unit.yml exec rails-unit bundle exec rspec \
               --format progress \
               --format RspecJunitFormatter \
