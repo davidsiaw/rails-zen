@@ -95,7 +95,7 @@ jobs:
           command: |
             mkdir -p /tmp/test-results
             docker-compose -f .circleci/compose-unit.yml exec rails-unit mkdir /tmp/test-results
-            docker-compose -f .circleci/compose.yml exec rails-unit rails db:test:prepare 
+            docker-compose -f .circleci/compose-unit.yml exec rails-unit rails db:test:prepare 
 
       - run:
           name: wait for container to ready
