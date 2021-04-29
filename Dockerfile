@@ -13,7 +13,8 @@ RUN apk --update add build-base git file less postgresql-dev nodejs tzdata curl 
     # cd rbspy && \
     # cargo install && \
     mkdir -p /srv/tmp && \
-    chown -R srv /srv
+    chown -R srv /srv && \
+    chgrp -R srv /srv
 
 ADD Gemfile Gemfile.lock Rakefile package.json .rspec .rubocop.yml .rubocop_todo.yml config.ru /srv/
 

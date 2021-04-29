@@ -23,7 +23,8 @@ jobs:
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.7
 
       - run:
           name: start stack
@@ -82,7 +83,8 @@ jobs:
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.7
 
       - run:
           name: start stack
@@ -141,7 +143,9 @@ jobs:
         environment:
           RAILS_ENV: test
     steps:
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.7
+
       - run:
           name: pull minazuki
           command: |
