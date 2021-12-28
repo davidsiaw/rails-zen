@@ -4,7 +4,6 @@ require 'rails_helper'
 require 'browser_helper'
 
 RSpec.describe 'Restricted Area', :js, type: :browser do
-  require 'tataru'
   let(:admin) { create :admin }
 
   it 'sidekiq cannot be accessed without logging in' do
