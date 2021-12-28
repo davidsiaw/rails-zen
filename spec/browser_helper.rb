@@ -28,5 +28,5 @@ Capybara.configure do |config|
 end
 
 RSpec.configure do |config|
-  config.include Capybara::DSL
+  config.include Capybara::DSL, type: :browser
 end
