@@ -188,7 +188,7 @@ GEM
     faraday-net_http_persistent (1.2.0)
     faraday-patron (1.0.0)
     faraday-rack (1.0.0)
-    ffaker (2.19.0)
+    ffaker (2.20.0)
     ffi (1.15.4)
     fugit (1.5.2)
       et-orbi (~> 1.1, >= 1.1.8)
