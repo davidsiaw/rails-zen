@@ -2,4 +2,3 @@
 
 require 'paper_trail/version'
 
-PaperTrail::Rails::Engine.eager_load!
