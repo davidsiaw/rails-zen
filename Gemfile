@@ -57,7 +57,7 @@ end
 
 group :test do
   gem 'capybara'
-  gem 'chromedriver-helper'
+  gem 'webdrivers'
   gem 'database_cleaner'
   gem 'rspec_junit_formatter'
   gem 'selenium-webdriver'
