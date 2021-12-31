@@ -220,7 +220,8 @@ GEM
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
     io-like (0.3.0)
-    jbuilder (2.11.2)
+    jbuilder (2.11.5)
+      actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
     kramdown (2.3.1)
       rexml
