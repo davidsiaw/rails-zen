@@ -50,5 +50,5 @@ test:
     - bundle exec rails db:create
     - bundle exec rails db:migrate
     - bundle exec rails db:test:prepare
-    - echo "$(cat /etc/hosts | grep -Eo "^([0-9\.]+)\s+runner-[0-9a-zA-Z]*-+project-[0-9a-zA-Z]+-concurrent-[0-9]+" | grep -Eo "^([0-9\.]+)")" > ip_addr
+    - echo "$(cat /etc/hosts | grep -Eo "^([0-9\.]+)\s+runner-[0-9a-zA-Z-]{8}-+project-[0-9a-zA-Z]+-concurrent-[0-9]+" | grep -Eo "^([0-9\.]+)")" > ip_addr
     - TEST_HOST="$(cat ip_addr)" bundle exec rspec
