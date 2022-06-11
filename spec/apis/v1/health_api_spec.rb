@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe V1::HealthApi, type: :request do
+RSpec.describe HealthApi, type: :request do
   it 'returns ok' do
     get '/api/v1/health'
     expect(response.body).to eq({ result: 'ok' }.to_json)
