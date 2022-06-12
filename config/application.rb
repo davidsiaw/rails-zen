@@ -21,7 +21,7 @@ module RailsZen
   # The application config
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.2
+    config.load_defaults 6.0
 
     # Clear hosts in Rails 6. No need to whitelist unless you
     # really want to.
@@ -50,5 +50,7 @@ module RailsZen
     logger           = ActiveSupport::Logger.new($stdout)
     logger.formatter = config.log_formatter
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
+
+    config.autoloader = :zeitwerk
   end
 end

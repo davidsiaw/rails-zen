@@ -10,7 +10,7 @@ class MainApi < Grape::API
   # Version 1
   class V1Api < Grape::API
     version 'v1', using: :path
-    mount V1::HealthApi
+    mount HealthApi
   end
 
   mount V1Api
