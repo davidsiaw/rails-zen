@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/ruby:2.6-node
+      - image: circleci/ruby:3.0-node
         environment:
           RAILS_ENV: test
 
@@ -70,7 +70,7 @@ jobs:
   build-unit:
     docker:
       # specify the version you desire here
-      - image: circleci/ruby:2.6-node
+      - image: circleci/ruby:3.0-node
         environment:
           RAILS_ENV: test
     working_directory: ~/repo
@@ -138,7 +138,7 @@ jobs:
 
   rubocop:
     docker:
-      - image: circleci/ruby:2.6-node
+      - image: circleci/ruby:3.0-node
         environment:
           RAILS_ENV: development
     steps:
