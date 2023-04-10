@@ -179,7 +179,7 @@ GEM
     git (1.18.0)
       addressable (~> 2.8)
       rchardet (~> 1.8)
-    globalid (1.0.0)
+    globalid (1.1.0)
       activesupport (>= 5.0)
     grape (1.6.2)
       activesupport
