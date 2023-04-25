@@ -24,6 +24,7 @@ services:
   # advantage to automate schedulable tasks.
   sidekiq:
     build: .
+    platform: linux/amd64
     command: bundle exec sidekiq -C config/sidekiq.yml
     environment:
       DATABASE_URL: postgres://postgres:postgres@db
@@ -40,6 +41,7 @@ services:
   # docker-compose exec rails rails db:migrate
   rails:
     build: .
+    platform: linux/amd64
     container_name: rails
     command: sh -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     ports:
@@ -62,6 +64,7 @@ services:
   # Use db/seed.rb to seed your database for development.
   rails_startup:
     build: .
+    platform: linux/amd64
     environment:
       DATABASE_URL: postgres://postgres:postgres@db
     depends_on:
@@ -100,6 +103,7 @@ services:
   # If you have a VNC client, simply login to port 5900 with the
   # password: secret
   chrome:
+    platform: linux/amd64
     image: selenium/standalone-chrome-debug
     container_name: chrome
     ports:
