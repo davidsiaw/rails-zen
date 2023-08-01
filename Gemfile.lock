@@ -83,7 +83,7 @@ GEM
       activerecord
     ast (2.4.2)
     base32-crockford (0.1.0)
-    bcrypt (3.1.18)
+    bcrypt (3.1.19)
     bindex (0.8.1)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
@@ -438,7 +438,7 @@ PLATFORMS
 
 DEPENDENCIES
   ar-uuid
-  bcrypt (~> 3.1.18)
+  bcrypt (~> 3.1.19)
   bootsnap (>= 1.1.0)
   capybara
   danger
