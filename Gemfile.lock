@@ -235,7 +235,7 @@ GEM
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
     language_server-protocol (3.17.0.3)
-    listen (3.8.0)
+    listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     loofah (2.22.0)
@@ -520,7 +520,7 @@ DEPENDENCIES
   grape-swagger-rails
   grape-swagger-representable
   jbuilder (~> 2.11)
-  listen (>= 3.0.5, < 3.9)
+  listen (>= 3.0.5, < 3.10)
   paper_trail
   pg (>= 0.18, < 2.0)
   pry-byebug
