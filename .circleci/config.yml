@@ -19,12 +19,12 @@ jobs:
       - run:
           name: install docker compose
           command: |
-            curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64 -o ~/docker-compose
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
       - setup_remote_docker:
-          version: 20.10.7
+          version: docker24
 
       - run:
           name: start stack
@@ -79,12 +79,12 @@ jobs:
       - run:
           name: install docker compose
           command: |
-            curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64 -o ~/docker-compose
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
       - setup_remote_docker:
-          version: 20.10.7
+          version: docker24
 
       - run:
           name: start stack
