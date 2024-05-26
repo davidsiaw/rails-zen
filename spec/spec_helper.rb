@@ -16,6 +16,9 @@ require 'factory_bot'
 # it.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
+require 'rails_helper'
+
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 
