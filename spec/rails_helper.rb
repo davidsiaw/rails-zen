@@ -37,8 +37,7 @@ RSpec.configure do |config|
   # Remember to include global test helpers here
   include ConcernHelper
 
-  # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  config.fixture_paths = ["#{::Rails.root}/spec/fixtures"]
 
   DatabaseCleaner.allow_remote_database_url = true
   config.use_transactional_fixtures = false

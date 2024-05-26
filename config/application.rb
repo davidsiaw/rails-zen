@@ -20,11 +20,8 @@ Bundler.require(*Rails.groups)
 module RailsZen
   # The application config
   class Application < Rails::Application
-    # Use new handling
-    config.active_record.legacy_connection_handling = false
-
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 6.0
+    config.load_defaults 7.0
 
     # Clear hosts in Rails 6. No need to whitelist unless you
     # really want to.

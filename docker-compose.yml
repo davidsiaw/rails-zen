@@ -58,6 +58,11 @@ services:
       - redis
     stdin_open: true
     tty: true
+    healthcheck:
+      test: ["CMD", "curl", "-vf", "http://localhost:3000/api/v1/health"] 
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   # Startup script
   # This container only starts to prepare the database. It will then exit after it is done.
@@ -108,6 +113,11 @@ services:
     container_name: chrome
     ports:
       - "5900:5900"
+    healthcheck:
+      test: ["CMD", "curl", "-vf", "http://localhost:4444/wd/hub/status"] 
+      interval: 10s
+      timeout: 5s
+      retries: 3
 volumes:
   db_data:
   active_storage:

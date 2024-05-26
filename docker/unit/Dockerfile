@@ -1,4 +1,4 @@
-FROM ruby:3.0-alpine
+FROM ruby:3.3-alpine
 
 ARG PUID=1000
 ARG PGID=1000

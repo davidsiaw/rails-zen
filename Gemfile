@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 7.0.8'
+gem 'rails', '~> 7'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
@@ -41,6 +41,8 @@ gem 'grape-swagger-entity'
 gem 'grape-swagger-rails'
 gem 'grape-swagger-representable'
 gem 'paper_trail'
+
+gem 'faraday-retry'
 
 gem 'ar-uuid'
 gem 'ulid-rails', git: 'https://github.com/davidsiaw/ulid-rails'
