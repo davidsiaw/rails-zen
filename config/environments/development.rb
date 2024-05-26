@@ -21,7 +21,7 @@ Rails.application.configure do
     config.action_controller.perform_caching = true
     config.cache_store = :redis_cache_store, { url: ENV['REDIS_URL'] }
 
-  elsif Rails.root.join('tmp', 'caching-dev.txt').exist?
+  elsif Rails.root.join('tmp/caching-dev.txt').exist?
     config.action_controller.perform_caching = true
 
     config.cache_store = :memory_store

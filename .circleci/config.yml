@@ -146,7 +146,7 @@ jobs:
       - run:
           name: install rubocop
           command: |
-            gem install rubocop
+            bundle install
       - run: rubocop
 
   danger:
@@ -157,9 +157,9 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install rubocop
+          name: install danger
           command: |
-            gem install danger
+            bundle install
             danger --version
       - run: danger --verbose
 
