@@ -136,11 +136,42 @@ jobs:
           path: /tmp/test-results
           destination: test-results
 
+  brakeman:
+    docker:
+      - image: cimg/ruby:3.3.1-node
+        environment:
+          RAILS_ENV: development
+          BUNDLE_ONLY: brakeman
+    steps:
+      - checkout
+      - run:
+          name: install brakeman
+          command: |
+            bundle install
+            brakeman --version
+      - run: brakeman
+
+  bundler-audit:
+    docker:
+      - image: cimg/ruby:3.3.1-node
+        environment:
+          RAILS_ENV: development
+          BUNDLE_ONLY: bundleraudit
+    steps:
+      - checkout
+      - run:
+          name: install bundler-audit
+          command: |
+            bundle install
+            bundler-audit version
+      - run: bundler-audit
+
   rubocop:
     docker:
       - image: cimg/ruby:3.3.1-node
         environment:
           RAILS_ENV: development
+          BUNDLE_ONLY: rubocop
     steps:
       - checkout
       - run:
@@ -154,6 +185,7 @@ jobs:
       - image: cimg/ruby:3.3.1-node
         environment:
           RAILS_ENV: development
+          BUNDLE_ONLY: danger
     steps:
       - checkout
       - run:
@@ -169,7 +201,13 @@ workflows:
     jobs:
       - build
       - build-unit
-      - rubocop
+      - brakeman
+      - bundler-audit
+      - rubocop:
+          filters:
+            branches:
+              ignore:
+                - master
       - danger:
           filters:
             branches:
