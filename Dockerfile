@@ -39,4 +39,4 @@ EXPOSE 3000
 
 ENV RAILS_ENV=development
 
-CMD ["sh", "-c", "rails s -b 0.0.0.0 -p 3000"]
+CMD ["sh", "-c", "rails s -u falcon -b 0.0.0.0 -p 3000"]

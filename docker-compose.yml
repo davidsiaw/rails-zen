@@ -1,4 +1,3 @@
-version: '3.7'
 services:
   # Rails database
   # If you wish to clear the database contents simply run
