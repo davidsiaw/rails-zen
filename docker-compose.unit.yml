@@ -54,5 +54,10 @@ services:
     container_name: chrome
     ports:
       - "5900:5900"
+    healthcheck:
+      test: ["CMD", "curl", "-v", "http://localhost:4444/wd/hub/status"] 
+      interval: 10s
+      timeout: 5s
+      retries: 3
 volumes:
   db_data:

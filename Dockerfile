@@ -38,9 +38,4 @@ EXPOSE 3000
 
 ENV RAILS_ENV=development
 
-HEALTHCHECK --interval=1m \
-            --timeout=3s \
-            --start-period=20s \
-  CMD curl -f http://localhost:3000/api/v1/health || exit 1
-
 CMD ["sh", "-c", "rails s -b 0.0.0.0 -p 3000"]

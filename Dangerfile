@@ -52,15 +52,13 @@ end
 # ------------------------------------------------------------------------------
 
 begin
-  unless github.api.organization_member?('bunnylabs', github.pr_author)
-    # Pay extra attention if they modify stuff
-    important_files = %w[Gemfile Dangerfile]
-    modified_important_files = git.modified_files & important_files
-    unless modified_important_files.empty?
-      warn <<~WARNING
-        External contributor has edited these files: #{modified_important_files.to_a.join(', ')}
-      WARNING
-    end
+  # Pay extra attention if they modify stuff
+  important_files = %w[Gemfile Dangerfile]
+  modified_important_files = git.modified_files & important_files
+  unless modified_important_files.empty?
+    warn <<~WARNING
+      External contributor has edited these files: #{modified_important_files.to_a.join(', ')}
+    WARNING
   end
 rescue URI::InvalidURIError => e
   warn <<~WARNING
