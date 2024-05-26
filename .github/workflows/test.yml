@@ -26,7 +26,7 @@ jobs:
           - 4444:4444
 
     container:
-      image: ruby:3.0-alpine
+      image: ruby:3.3-alpine
 
     steps:
       - uses: actions/checkout@v2
