@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
 require 'browser_helper'
 
 RSpec.describe 'Restricted Area', :js, type: :browser do

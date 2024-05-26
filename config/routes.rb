@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   devise_for :admins, controllers: {
     sessions: 'admins/sessions'
   }
+
   authenticate :admin do
     mount GrapeSwaggerRails::Engine => '/swagger'
     mount Sidekiq::Web => '/sidekiq'
