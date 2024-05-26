@@ -29,7 +29,7 @@ jobs:
       - run:
           name: start stack
           command: |
-            docker-compose -f .circleci/compose.yml up -d
+            docker-compose -f .circleci/compose.yml up -d --wait
             docker-compose -f .circleci/compose.yml exec rails bundle exec rails db:create
             docker-compose -f .circleci/compose.yml exec rails bundle exec rails db:schema:load
 
@@ -89,7 +89,7 @@ jobs:
       - run:
           name: start stack
           command: |
-            docker-compose -f .circleci/compose-unit.yml up -d
+            docker-compose -f .circleci/compose-unit.yml up -d --wait
 
       # run tests!
       - run:
