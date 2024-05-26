@@ -98,7 +98,12 @@ GEM
     bindex (0.8.1)
     bootsnap (1.18.3)
       msgpack (~> 1.2)
+    brakeman (6.1.2)
+      racc
     builder (3.2.4)
+    bundler-audit (0.9.1)
+      bundler (>= 1.2.0, < 3)
+      thor (~> 1.0)
     byebug (11.1.3)
     capybara (3.40.0)
       addressable
@@ -499,6 +504,8 @@ DEPENDENCIES
   ar-uuid
   bcrypt (~> 3.1.19)
   bootsnap (>= 1.1.0)
+  brakeman
+  bundler-audit
   capybara
   danger
   database_cleaner
