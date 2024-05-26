@@ -1,31 +1,36 @@
 inherit_from: .rubocop_todo.yml
 
+require:
+  - rubocop-capybara
+  - rubocop-factory_bot
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-rspec_rails
+
 AllCops:
+  NewCops: enable
+
   TargetRubyVersion: 3.3
   Exclude:
     - 'db/migrate/*.rb'
-    - 'db/schema.rb'
-    - 'bin/setup'
-    - 'bin/update'
     - 'lib/templates/**/*'
     - 'vendor/**/*'
+    - bin/setup
+    - bin/update
 
 Style/Documentation:
   Exclude:
-    - 'spec/**/*'
     - 'Gemfile'
     - 'Rakefile'
 
 Metrics/BlockLength:
   Exclude:
-    - 'app/apis/**/*'
     - 'config/**/*'
-    - 'spec/**/*'
+    - 'db/schema.rb'
 
-Metrics/LineLength:
+Layout/LineLength:
   Exclude:
     - 'config/**/*'
-    - 'spec/**/*'
     - 'Gemfile'
     - 'Rakefile'
 

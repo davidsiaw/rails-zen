@@ -10,6 +10,6 @@ RSpec.describe HealthApi, type: :request do
 
   it 'returns ok status' do
     get '/api/v1/health'
-    expect(response.status).to eq 200
+    expect(response).to have_http_status :ok
   end
 end

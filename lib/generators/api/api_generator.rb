@@ -47,14 +47,14 @@ class ApiGenerator < Rails::Generators::Base
   end
 
   def fields
-    @fields ||= member_list.map do |member|
+    @fields ||= member_list.to_h do |member|
       tokens = member.split(':')
       [tokens[0], {
         param_name: pname_of(tokens),
         param_type: ptype_of(tokens),
         full_type: tokens[1]
       }]
-    end.to_h
+    end
   end
 
   private
@@ -128,7 +128,7 @@ class ApiGenerator < Rails::Generators::Base
               "    #{mount_statement}",
               mount_end].map { |x| "#{x}\n" }
 
-    File.open(main_api_path, 'wb') { |file| file.write(result) }
+    File.binwrite(main_api_path, result)
   end
 
   def unmount_api
@@ -138,7 +138,7 @@ class ApiGenerator < Rails::Generators::Base
               mount_list_sans_statement,
               mount_end].map { |x| "#{x}\n" }
 
-    File.open(main_api_path, 'wb') { |file| file.write(result) }
+    File.binwrite(main_api_path, result)
   end
 end
 # rubocop:enable Metrics/ClassLength

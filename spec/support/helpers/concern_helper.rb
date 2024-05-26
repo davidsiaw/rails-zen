@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# helps us test concerns
 module ConcernHelper
   def spec_dir
     File.dirname metadata[:file_path]

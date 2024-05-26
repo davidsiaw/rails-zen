@@ -4,13 +4,13 @@ require 'rails_helper'
 require 'browser_helper'
 
 RSpec.describe 'Restricted Area', :js, type: :browser do
-  let(:admin) { create :admin }
+  let(:admin) { create(:admin) }
 
   it 'sidekiq cannot be accessed without logging in' do
     visit('/sidekiq')
     fill_in 'Email', with: admin.email
     fill_in 'Password', with: admin.password
-    click_button
+    click_link_or_button 'Log in'
     expect(page.body).to match 'Sidekiq'
   end
 
@@ -18,7 +18,7 @@ RSpec.describe 'Restricted Area', :js, type: :browser do
     visit('/swagger')
     fill_in 'Email', with: admin.email
     fill_in 'Password', with: admin.password
-    click_button
+    click_link_or_button 'Log in'
     expect(page.body).to match 'Swagger'
   end
 end

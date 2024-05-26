@@ -20,7 +20,7 @@ end
 # Mainly to encourage writing up some reasoning about the PR, rather than
 # just leaving a title
 # ------------------------------------------------------------------------------
-fail 'Please provide a summary in the Pull Request description' if github.pr_body.length < 5
+raise 'Please provide a summary in the Pull Request description' if github.pr_body.length < 5
 
 # ------------------------------------------------------------------------------
 # You've made changes to specs, but no library code has changed?
@@ -42,8 +42,8 @@ end
 
   contents = File.read(file)
   if file.start_with?('spec')
-    fail("`xit` or `fit` left in tests (#{file})") if contents =~ /^\w*[xf]it/
-    fail("`fdescribe` left in tests (#{file})") if contents =~ /^\w*fdescribe/
+    raise("`xit` or `fit` left in tests (#{file})") if contents =~ /^\w*[xf]it/
+    raise("`fdescribe` left in tests (#{file})") if contents =~ /^\w*fdescribe/
   end
 end
 
@@ -52,13 +52,15 @@ end
 # ------------------------------------------------------------------------------
 
 begin
-  # Pay extra attention if they modify stuff
-  important_files = %w[Gemfile Dangerfile]
-  modified_important_files = git.modified_files & important_files
-  unless modified_important_files.empty?
-    warn <<~WARNING
-      External contributor has edited these files: #{modified_important_files.to_a.join(', ')}
-    WARNING
+  unless github.api.organization_member?('bunnylabs', github.pr_author)
+    # Pay extra attention if they modify stuff
+    important_files = %w[Gemfile Dangerfile]
+    modified_important_files = git.modified_files & important_files
+    unless modified_important_files.empty?
+      warn <<~WARNING
+        External contributor has edited these files: #{modified_important_files.to_a.join(', ')}
+      WARNING
+    end
   end
 rescue URI::InvalidURIError => e
   warn <<~WARNING
@@ -76,6 +78,6 @@ message(':tada:') if github.pr_author != 'davidsiaw'
 # Ensure a clean commits history
 # ------------------------------------------------------------------------------
 branch = github.branch_for_base
-if git.commits.any? { |c| c.message =~ /^Merge branch '#{branch}'/ }
-  fail('Please rebase to get rid of the merge commits in this PR')
+raise('Please rebase to get rid of the merge commits in this PR') if git.commits.any? do |c|
+  c.message =~ /^Merge branch '#{branch}'/
 end

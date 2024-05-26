@@ -37,7 +37,7 @@ module RailsZen
     config.generators.system_tests = nil
 
     config.paths.add File.join('app', 'apis'), glob: File.join('**', '*.rb')
-    config.autoload_paths += Dir[Rails.root.join('app', 'apis', '*')]
+    config.autoload_paths += Dir[Rails.root.join('app/apis/*')]
     config.active_job.queue_adapter = :sidekiq
 
     # Use default logging formatter so that PID and timestamp are not suppressed.
