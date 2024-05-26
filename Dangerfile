@@ -62,7 +62,7 @@ begin
         External contributor has edited these files: #{modified_important_files.to_a.join(', ')}
 
         this is because
-        github.api.organization_member?('bunnylabs', '#{github.pr_author}'') == #{ismember}
+        github.api.organization_member?('bunnylabs', '#{github.pr_author}') == #{ismember}
       WARNING
     end
   end
