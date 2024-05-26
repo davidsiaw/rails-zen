@@ -136,6 +136,20 @@ jobs:
           path: /tmp/test-results
           destination: test-results
 
+  brakeman:
+    docker:
+      - image: cimg/ruby:3.3.1-node
+        environment:
+          RAILS_ENV: development
+    steps:
+      - checkout
+      - run:
+          name: install brakeman
+          command: |
+            BUNDLE_ONLY=brakeman bundle install
+            brakeman --version
+      - run: brakeman
+
   rubocop:
     docker:
       - image: cimg/ruby:3.3.1-node
@@ -146,7 +160,7 @@ jobs:
       - run:
           name: install rubocop
           command: |
-            bundle install
+            BUNDLE_ONLY=rubocop bundle install
       - run: rubocop
 
   danger:
@@ -159,7 +173,7 @@ jobs:
       - run:
           name: install danger
           command: |
-            bundle install
+            BUNDLE_ONLY=danger bundle install
             danger --version
       - run: danger --verbose
 
