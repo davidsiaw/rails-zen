@@ -25,13 +25,12 @@ before_script:
   - gem install bundler                       # Bundler is not installed with the image
   - bundle install -j $(nproc) --path vendor  # Install dependencies into ./vendor/ruby
 
-# Optional - Delete if not using `rubocop`
 rubocop:
-  tags:
-    - ruby
+  variables:
+    BUNDLE_ONLY: rubocop
   before_script:
     - apk --update add build-base git
-    - gem install rubocop
+    - bundle install
   script:
     - rubocop
 
@@ -40,8 +39,6 @@ test:
     - redis:alpine
     - postgres:alpine
     - selenium/standalone-chrome
-  tags:
-    - ruby
   variables:
     DATABASE_URL: postgres://postgres:postgres@postgres
     REDIS_URL: redis://redis:6379/0

@@ -10,6 +10,7 @@ jobs:
       - image: cimg/ruby:3.3.1-node
         environment:
           RAILS_ENV: test
+          BUILDKIT_PROGRESS: plain
 
     working_directory: ~/repo
 
@@ -39,8 +40,12 @@ jobs:
           command: |
             mkdir -p /tmp/test-results
             docker-compose -f .circleci/compose.yml exec rails mkdir /tmp/test-results
-            docker-compose -f .circleci/compose.yml exec rails rails db:test:prepare 
+            docker-compose -f .circleci/compose.yml exec rails rails db:test:prepare
 
+      - run:
+          name: request to start recording video
+          command: |
+            docker-compose -f .circleci/compose.yml exec rails curl chromevideo:9494/start
       - run:
           name: run tests
           command: |
@@ -67,12 +72,28 @@ jobs:
           path: /tmp/test-results
           destination: test-results
 
+      - run:
+          name: request to stop recording video
+          when: always
+          command: |
+            sleep 3 # wait a bit for the video to finish being made
+            docker-compose -f .circleci/compose.yml exec rails curl chromevideo:9494/stop
+      - run:
+          name: download the video
+          when: always
+          command: |
+            docker cp chromevideo:/var/output/out.mp4 /tmp/test-video.mp4
+      - store_artifacts:
+          when: always
+          path: /tmp/test-video.mp4
+
   build-unit:
     docker:
       # specify the version you desire here
       - image: cimg/ruby:3.3.1-node
         environment:
           RAILS_ENV: test
+          BUILDKIT_PROGRESS: plain
     working_directory: ~/repo
     steps:
       - checkout
@@ -98,6 +119,11 @@ jobs:
             mkdir -p /tmp/test-results
             docker-compose -f .circleci/compose-unit.yml exec rails-unit mkdir /tmp/test-results
             docker-compose -f .circleci/compose-unit.yml exec rails-unit rails db:test:prepare 
+
+      - run:
+          name: request to start recording video
+          command: |
+            docker-compose -f .circleci/compose-unit.yml exec rails-unit curl chromevideo:9494/start
 
       - run:
           name: wait for container to ready
@@ -135,6 +161,21 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
+
+      - run:
+          name: request to stop recording video
+          when: always
+          command: |
+            sleep 3 # wait a bit for the video to finish being made
+            docker-compose -f .circleci/compose-unit.yml exec rails-unit curl chromevideo:9494/stop
+      - run:
+          name: download the video
+          when: always
+          command: |
+            docker cp chromevideo:/var/output/out.mp4 /tmp/test-video.mp4
+      - store_artifacts:
+          when: always
+          path: /tmp/test-video.mp4
 
   brakeman:
     docker:
