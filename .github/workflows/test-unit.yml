@@ -1,17 +1,29 @@
 name: test-unit
 on: [push]
 jobs:
-  test-unit:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - name: install docker compose
-        run: sudo curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-      - name: Build and run tests
-        run: |
-          docker-compose -f .circleci/compose-unit.yml up -d --wait
-          timeout 60 bash -c -- 'while [[ "$(docker-compose -f .circleci/compose-unit.yml exec -T rails-unit curl -s -o /dev/null -w ''%{http_code}'' http://localhost:3000/api/v1/health)" != "200" ]]; do sleep 1; printf "."; done'
-          docker-compose -f .circleci/compose-unit.yml exec -T rails-unit bundle exec rails db:test:prepare
-          docker-compose -f .circleci/compose-unit.yml exec -T rails-unit bundle exec rspec --format progress
-
+      - uses: actions/checkout@v4
+      - name: compose up
+        run: |-
+          PUID="$(id -u)" PGID="$(id -g)" docker compose -f docker-compose.unit.yml up -d --wait --build
+      - name: show logs
+        if: failure()
+        run: |-
+          docker compose logs rails
+      - name: start recording
+        run: |-
+          docker compose -f docker-compose.unit.yml exec rz curl chromevideo:9494/start
+      - name: run tests
+        run: |-
+          docker compose -f docker-compose.unit.yml exec rz rspec
+      - name: stop recording
+        run: |-
+          docker compose -f docker-compose.unit.yml exec rz curl chromevideo:9494/stop
+          sleep 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-video
+          path: vidoutput/out.mp4
+          if-no-files-found: error

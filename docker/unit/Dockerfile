@@ -13,8 +13,7 @@ RUN apk --update add build-base git file less postgresql-dev nodejs tzdata curl 
     # git clone https://github.com/rbspy/rbspy && \
     # cd rbspy && \
     # cargo install && \
-    mkdir -p /srv/tmp && \
-    chown -R srv /srv
+    mkdir -p /srv/tmp
 
 ADD Gemfile Gemfile.lock Rakefile package.json .rspec .rubocop.yml .rubocop_todo.yml config.ru /srv/
 
@@ -34,7 +33,11 @@ ADD --chown=srv:srv app /srv/app
 
 ADD --chown=srv:srv docker/unit/start.sh docker/unit/waitpg.sh docker/unit/waitredis.sh docker/unit/Procfile /srv/
 
-RUN mkdir -p /run/redis && mkdir -p /run/postgresql && chown -R srv:srv /run
+RUN mkdir -p /run/redis && \
+    mkdir -p /run/postgresql && \
+    chown -R srv:srv /run && \
+    chown -R srv /srv && \
+    chgrp -R srv /srv
 
 USER srv
 

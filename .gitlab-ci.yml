@@ -39,14 +39,28 @@ test:
     - redis:alpine
     - postgres:alpine
     - selenium/standalone-chrome
+    - davidsiaw/vrec
   variables:
     DATABASE_URL: postgres://postgres:postgres@postgres
     REDIS_URL: redis://redis:6379/0
     CHROME_HOSTNAME: selenium-standalone-chrome
+    SCREEN_WIDTH: 1280
+    SCREEN_HEIGHT: 1024
+    HOST: 'selenium-standalone-chrome:5900'
+    MP4LOC: '/builds/astrobunny/rails-zen/out.mp4'
+    GIVEUID: "1000"
+    GIVEGID: "1000"
   script:
     - bundle exec rails db:create
     - bundle exec rails db:migrate
     - bundle exec rails db:test:prepare
     - cat /etc/hosts
-    - echo "$(cat /etc/hosts | grep -Eo "^([0-9\.]+)\s+runner-[0-9a-zA-Z-]{7,8}-+project-[0-9a-zA-Z]+-concurrent-[0-9]+" | grep -Eo "^([0-9\.]+)")" > ip_addr
+    - echo "$(cat /etc/hosts | grep -Eo "^([0-9\.]+)\s+runner-[0-9a-zA-Z-]+-+project-[0-9a-zA-Z]+-concurrent-[0-9]+" | grep -Eo "^([0-9\.]+)")" > ip_addr
+    - curl davidsiaw-vrec:9494/start
     - TEST_HOST="$(cat ip_addr)" bundle exec rspec
+    - curl davidsiaw-vrec:9494/stop
+    - sleep 3
+    - ls
+  artifacts:
+    paths:
+      - out.mp4
