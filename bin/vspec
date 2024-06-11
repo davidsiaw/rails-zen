@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'time'
+
+system 'curl chromevideo:9494/start'
+
+system 'rspec'
+
+sleep 3
+
+system 'curl chromevideo:9494/stop'
+
+system "cp vidoutput/out.mp4 vidoutput/#{Time.now.iso8601}-test.mp4"

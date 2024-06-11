@@ -18,11 +18,25 @@ services:
   chrome:
     image: selenium/standalone-chrome
     container_name: chrome
+    environment:
+      SCREEN_WIDTH: 1280
+      SCREEN_HEIGHT: 1024
     healthcheck:
       test: ["CMD", "curl", "-v", "http://localhost:4444/wd/hub/status"] 
       interval: 10s
       timeout: 5s
       retries: 3
+  chromevideo:
+    platform: linux/amd64
+    image: davidsiaw/vrec
+    container_name: chromevideo
+    environment:
+      HOST: 'chrome:5900'
+      MP4LOC: '/var/output/out.mp4'
+      GIVEUID: "1000"
+      GIVEGID: "1000"
+    depends_on:
+      - chrome
 volumes:
   db_data:
   active_storage:
