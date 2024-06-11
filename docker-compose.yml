@@ -23,7 +23,11 @@ services:
   # emails, do periodic checks etc. I recommend using this to your
   # advantage to automate schedulable tasks.
   sidekiq:
-    build: .
+    build:
+      context: .
+      args:
+        PUID: ${PUID}
+        PGID: ${PGID}
     platform: linux/amd64
     command: bundle exec sidekiq -C config/sidekiq.yml
     environment:
@@ -40,7 +44,11 @@ services:
   # Using this mechanism you can also perform database migrations and rollbacks
   # docker-compose exec rails rails db:migrate
   rails:
-    build: .
+    build:
+      context: .
+      args:
+        PUID: ${PUID}
+        PGID: ${PGID}
     platform: linux/amd64
     container_name: rails
     command: sh -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
@@ -68,14 +76,18 @@ services:
   # This container only starts to prepare the database. It will then exit after it is done.
   # Use db/seed.rb to seed your database for development.
   rails_startup:
-    build: .
+    build:
+      context: .
+      args:
+        PUID: ${PUID}
+        PGID: ${PGID}
     platform: linux/amd64
     environment:
       DATABASE_URL: postgres://postgres:postgres@db
     depends_on:
       - db
       - redis
-    command: sh -c "rails db:create && rails db:migrate && rails db:seed"
+    command: sh bin/dbsetup
 
   # ****************
   # Tools
@@ -111,6 +123,9 @@ services:
     platform: linux/amd64
     image: selenium/standalone-chrome-debug
     container_name: chrome
+    environment:
+      SCREEN_WIDTH: 1280
+      SCREEN_HEIGHT: 1024
     ports:
       - "5900:5900"
     healthcheck:
@@ -118,6 +133,23 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+  video:
+    platform: linux/amd64
+    image: davidsiaw/vrec
+    container_name: chromevideo
+    environment:
+      HOST: 'chrome:5900'
+      MP4LOC: '/var/output/out.mp4'
+      GIVEUID: "1000"
+      GIVEGID: "1000"
+    ports:
+      - "9494:9494"
+    volumes:
+      - type: bind
+        source: ./vidoutput
+        target: /var/output
+    depends_on:
+      - chrome
 volumes:
   db_data:
   active_storage:

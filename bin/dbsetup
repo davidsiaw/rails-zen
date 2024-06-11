@@ -1,0 +1,6 @@
+#!/bin/sh
+
+rails db:create
+rails db:migrate
+rails db:seed
+rails db:create RAILS_ENV=test

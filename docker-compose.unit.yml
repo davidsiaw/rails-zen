@@ -3,7 +3,13 @@ services:
   rz:
     build:
       context: .
+      args:
+        PUID: ${PUID}
+        PGID: ${PGID}
       dockerfile: docker/unit/Dockerfile
+    environment:
+      TEST_HOST: rz
+      CHROME_HOSTNAME: chrome # Point to the chrome container for testing
     container_name: rz
     volumes:
       - ./docker/unit/postgresql.conf:/srv/postgres/postgresql.conf:ro
@@ -52,6 +58,9 @@ services:
   chrome:
     image: selenium/standalone-chrome-debug
     container_name: chrome
+    environment:
+      SCREEN_WIDTH: 1280
+      SCREEN_HEIGHT: 1024
     ports:
       - "5900:5900"
     healthcheck:
@@ -59,5 +68,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+  video:
+    platform: linux/amd64
+    image: davidsiaw/vrec
+    container_name: chromevideo
+    environment:
+      HOST: 'chrome:5900'
+      MP4LOC: '/var/output/out.mp4'
+      GIVEUID: "1000"
+      GIVEGID: "1000"
+    ports:
+      - "9494:9494"
+    volumes:
+      - type: bind
+        source: ./vidoutput
+        target: /var/output
+    depends_on:
+      - chrome
 volumes:
   db_data:
