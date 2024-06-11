@@ -74,14 +74,17 @@ jobs:
 
       - run:
           name: request to stop recording video
+          when: always
           command: |
             sleep 3 # wait a bit for the video to finish being made
             docker-compose -f .circleci/compose.yml exec rails curl chromevideo:9494/stop
       - run:
           name: download the video
+          when: always
           command: |
             docker cp chromevideo:/var/output/out.mp4 /tmp/test-video.mp4
       - store_artifacts:
+          when: always
           path: /tmp/test-video.mp4
 
   build-unit:
@@ -120,7 +123,7 @@ jobs:
       - run:
           name: request to start recording video
           command: |
-            docker-compose -f .circleci/compose.yml exec rails curl chromevideo:9494/start
+            docker-compose -f .circleci/compose-unit.yml exec rails-unit curl chromevideo:9494/start
 
       - run:
           name: wait for container to ready
@@ -161,14 +164,17 @@ jobs:
 
       - run:
           name: request to stop recording video
+          when: always
           command: |
             sleep 3 # wait a bit for the video to finish being made
             docker-compose -f .circleci/compose-unit.yml exec rails-unit curl chromevideo:9494/stop
       - run:
           name: download the video
+          when: always
           command: |
             docker cp chromevideo:/var/output/out.mp4 /tmp/test-video.mp4
       - store_artifacts:
+          when: always
           path: /tmp/test-video.mp4
 
   brakeman:
