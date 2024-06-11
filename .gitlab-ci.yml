@@ -27,8 +27,6 @@ before_script:
 
 # Optional - Delete if not using `rubocop`
 rubocop:
-  tags:
-    - ruby
   before_script:
     - apk --update add build-base git
     - gem install rubocop
@@ -40,8 +38,6 @@ test:
     - redis:alpine
     - postgres:alpine
     - selenium/standalone-chrome
-  tags:
-    - ruby
   variables:
     DATABASE_URL: postgres://postgres:postgres@postgres
     REDIS_URL: redis://redis:6379/0
