@@ -25,11 +25,12 @@ before_script:
   - gem install bundler                       # Bundler is not installed with the image
   - bundle install -j $(nproc) --path vendor  # Install dependencies into ./vendor/ruby
 
-# Optional - Delete if not using `rubocop`
 rubocop:
+  variables:
+    BUNDLE_ONLY: rubocop
   before_script:
     - apk --update add build-base git
-    - gem install rubocop
+    - bundle install
   script:
     - rubocop
 
