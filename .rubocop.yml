@@ -37,3 +37,8 @@ Layout/LineLength:
 Style/SignalException:
   Exclude:
     - 'Dangerfile'
+
+# We don't want this
+Rails/ApplicationRecord:
+  Exclude:
+    - 'app/models/paper_trail/version.rb'

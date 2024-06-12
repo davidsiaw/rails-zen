@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
 RSpec.describe HealthApi, type: :request do
   it 'returns ok' do
     get '/api/v1/health'
