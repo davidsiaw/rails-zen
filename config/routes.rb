@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     sessions: 'admins/sessions'
   }
 
+  # remove these if you do not want the websocket endpoints
   get 'websocket', to: 'websocket#index'
   match 'connect', to: 'websocket#connect', via: %i[get connect]
 

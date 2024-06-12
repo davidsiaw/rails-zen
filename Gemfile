@@ -56,6 +56,7 @@ gem 'async-websocket'
 gem 'thread-local'
 
 group :development, :test do
+  gem 'async-rspec'
   gem 'factory_bot_rails'
   gem 'pry-byebug', platforms: %i[mri mingw x64_mingw]
   gem 'rspec-rails'
