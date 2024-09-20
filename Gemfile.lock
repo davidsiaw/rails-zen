@@ -297,7 +297,7 @@ GEM
     psych (5.1.2)
       stringio
     public_suffix (5.0.5)
-    puma (6.4.2)
+    puma (6.4.3)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.0)
@@ -520,7 +520,7 @@ DEPENDENCIES
   paper_trail
   pg (>= 0.18, < 2.0)
   pry-byebug
-  puma (~> 6.3)
+  puma (~> 6.4)
   rails (~> 7)
   redis (~> 5.0)
   rspec-rails
