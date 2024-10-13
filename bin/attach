@@ -1,5 +1,5 @@
 #!/bin/sh
 
-docker-compose logs --tail 20 rails
+docker compose logs --tail 20 rails
 docker attach --sig-proxy=false rails
 docker start rails
