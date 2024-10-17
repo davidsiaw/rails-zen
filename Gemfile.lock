@@ -222,7 +222,7 @@ GEM
     irb (1.14.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    jbuilder (2.12.0)
+    jbuilder (2.13.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
     json (2.7.2)
@@ -508,7 +508,7 @@ DEPENDENCIES
   grape-swagger-entity
   grape-swagger-rails
   grape-swagger-representable
-  jbuilder (~> 2.11)
+  jbuilder (~> 2.13)
   listen (>= 3.0.5, < 3.10)
   paper_trail
   pg (>= 0.18, < 2.0)
