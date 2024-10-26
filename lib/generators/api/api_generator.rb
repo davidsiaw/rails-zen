@@ -109,7 +109,7 @@ class ApiGenerator < Rails::Generators::Base
   end
 
   def mount_list_sans_statement
-    mount_list.filter { |x| x !~ /#{mount_statement}/ }
+    mount_list.grep_v(/#{mount_statement}/)
   end
 
   def mount_start
