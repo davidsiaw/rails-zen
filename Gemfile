@@ -7,8 +7,8 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 gem 'rails', '~> 7'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
-# Use Puma as the app server
-gem 'puma', '~> 6.3'
+# Use falcon as webserver
+gem 'falcon'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 6.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -50,15 +50,21 @@ gem 'ulid-rails', git: 'https://github.com/davidsiaw/ulid-rails'
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
 
+gem 'async-io'
+gem 'async-redis'
+gem 'async-websocket'
+gem 'thread-local'
+
 group :development, :test do
+  gem 'async-rspec'
   gem 'factory_bot_rails'
   gem 'pry-byebug', platforms: %i[mri mingw x64_mingw]
   gem 'rspec-rails'
 end
 
 group :test do
-  gem 'capybara'
   gem 'database_cleaner'
+  gem 'falcon-capybara'
   gem 'rspec_junit_formatter'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
