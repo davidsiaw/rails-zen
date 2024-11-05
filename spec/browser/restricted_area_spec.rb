@@ -10,7 +10,7 @@ RSpec.describe 'Restricted Area', :js, type: :browser do
     fill_in 'Email', with: admin.email
     fill_in 'Password', with: admin.password
     click_link_or_button 'Log in'
-    expect(page).to have_content("Sidekiq")
+    expect(page).to have_content('Sidekiq')
   end
 
   it 'swagger cannot be accessed without logging in' do
@@ -18,6 +18,6 @@ RSpec.describe 'Restricted Area', :js, type: :browser do
     fill_in 'Email', with: admin.email
     fill_in 'Password', with: admin.password
     click_link_or_button 'Log in'
-    expect(page).to have_content("Swagger")
+    expect(page).to have_content('Swagger')
   end
 end
