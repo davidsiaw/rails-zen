@@ -119,7 +119,7 @@ jobs:
             mkdir -p /tmp/test-results
             docker-compose -f .circleci/compose-unit.yml exec rails-unit mkdir /tmp/test-results
             docker-compose -f .circleci/compose-unit.yml exec rails-unit rails db:test:prepare
-            docker-compose -f .circleci/compose-unit.yml.yml logs rails-unit
+            docker-compose -f .circleci/compose-unit.yml logs rails-unit
 
       - run:
           name: request to start recording video
