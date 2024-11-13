@@ -88,8 +88,8 @@ GEM
     ar-uuid (0.2.3)
       activerecord
     ast (2.4.2)
-    async (2.18.0)
-      console (~> 1.26)
+    async (2.20.0)
+      console (~> 1.29)
       fiber-annotation
       io-event (~> 1.6, >= 1.6.5)
     async-container (0.18.3)
@@ -111,7 +111,7 @@ GEM
     async-pool (0.10.1)
       async (>= 1.25)
       traces
-    async-redis (0.10.1)
+    async-redis (0.11.0)
       async (~> 2.10)
       async-pool (~> 0.2)
       io-endpoint (~> 0.10)
@@ -291,14 +291,14 @@ GEM
     io-console (0.7.2)
     io-endpoint (0.14.0)
     io-event (1.7.3)
-    io-stream (0.6.0)
+    io-stream (0.6.1)
     irb (1.14.1)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jbuilder (2.13.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
-    json (2.8.0)
+    json (2.8.1)
     kramdown (2.4.0)
       rexml
     kramdown-parser-gfm (1.1.0)
