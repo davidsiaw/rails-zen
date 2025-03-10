@@ -52,5 +52,7 @@ module RailsZen
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
 
     config.autoloader = :zeitwerk
+
+    config.active_support.to_time_preserves_timezone = :zone
   end
 end
