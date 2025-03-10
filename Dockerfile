@@ -3,7 +3,7 @@ FROM ruby:3.3-alpine
 ARG PUID=1000
 ARG PGID=1000
 
-RUN apk --update add build-base git file less postgresql-dev nodejs tzdata curl rust cargo && \
+RUN apk --update add build-base git file less postgresql-dev nodejs tzdata curl rust cargo yaml-dev linux-headers && \
 	addgroup -g ${PGID} srv && \
     adduser -D -u ${PUID} -G srv srv && \
     # mkdir -p /tmp/ && \ # Uncomment these if you want rbspy
