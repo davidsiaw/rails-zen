@@ -286,7 +286,7 @@ GEM
     grape-swagger (2.1.2)
       grape (>= 1.7, < 3.0)
       rack-test (~> 2)
-    grape-swagger-entity (0.6.1)
+    grape-swagger-entity (0.6.2)
       grape-entity (~> 1)
       grape-swagger (~> 2)
     grape-swagger-rails (0.6.0)
