@@ -12,7 +12,6 @@ require 'action_controller/railtie'
 require 'action_mailer/railtie'
 require 'action_view/railtie'
 require 'action_cable/engine'
-require 'sprockets/railtie'
 # require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
@@ -53,6 +52,6 @@ module RailsZen
 
     config.autoloader = :zeitwerk
 
-    config.active_support.to_time_preserves_timezone = :zone
+    config.active_storage.variant_processor = :disabled
   end
 end

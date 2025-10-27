@@ -23,6 +23,10 @@ This skeleton allows you to achieve zen with Rails.
 - Devise for swagger and sidekiq dashboards (and everything else you want)
 - Pre-prepared browser test suite
 
+# Notes
+
+- DEPRECATION WARNING: ActiveSupport::Configurable is deprecated without replacement, and will be removed in Rails 8.2. - is being resolved in https://github.com/ruby-grape/grape/issues/2616
+
 ## Getting Started
 
 Rails Zen comes with a set of useful bash scripts for happy debugging

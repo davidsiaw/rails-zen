@@ -9,8 +9,7 @@ gem 'rails', '~> 8'
 gem 'pg', '>= 0.18', '< 2.0'
 # Use falcon as webserver
 gem 'falcon'
-# Use SCSS for stylesheets
-gem 'sass-rails', '~> 6.0'
+gem 'falcon-rails'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
@@ -50,7 +49,6 @@ gem 'ulid-rails', git: 'https://github.com/davidsiaw/ulid-rails'
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
 
-gem 'async-io'
 gem 'async-redis'
 gem 'async-websocket'
 gem 'thread-local'

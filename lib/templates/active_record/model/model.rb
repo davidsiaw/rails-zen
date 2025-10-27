@@ -8,7 +8,7 @@ class <%= class_name %> < <%= parent_class_name.classify %>
   # @!attribute <%= attribute.name %>
   <%- if attribute.reference? -%>
   #   @return [<%= attribute.name.camelize %>] Description of this attribute
-  uuid :<%= attribute.name %>_id
+  ulid :<%= attribute.name %>_id
   belongs_to :<%= attribute.name %><%= ', polymorphic: true' if attribute.polymorphic? %><%= ', required: true' if attribute.required? %>
   <%- else -%>
   #   @return [<%= attribute.type.to_s.camelize %>] Description of this attribute
