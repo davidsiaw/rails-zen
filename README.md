@@ -22,6 +22,7 @@ This skeleton allows you to achieve zen with Rails.
 - Comes with a nice docker compose that sets up a dev environment that you can use immediately
 - Devise for swagger and sidekiq dashboards (and everything else you want)
 - Pre-prepared browser test suite
+- No more sprockets!
 
 # Notes
 
