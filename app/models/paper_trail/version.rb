@@ -5,6 +5,7 @@ module PaperTrail
   class Version < ActiveRecord::Base
     include PaperTrail::VersionConcern
     include ULID::Rails
+
     ulid :id
     ulid :item_id
   end
