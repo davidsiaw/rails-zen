@@ -300,7 +300,9 @@ GEM
     faraday-retry (2.4.0)
       faraday (~> 2.0)
     ffaker (2.25.0)
-    ffi (1.16.3)
+    ffi (1.17.3-aarch64-linux-gnu)
+    ffi (1.17.3-x86_64-linux-gnu)
+    ffi (1.17.3-x86_64-linux-musl)
     fiber-annotation (0.2.0)
     fiber-local (1.1.0)
       fiber-storage
@@ -357,7 +359,8 @@ GEM
       kramdown (~> 2.0)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
-    listen (3.9.0)
+    listen (3.10.0)
+      logger
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     live (0.18.0)
@@ -697,7 +700,7 @@ DEPENDENCIES
   grape-swagger-rails
   grape-swagger-representable
   jbuilder (~> 2.14)
-  listen (>= 3.0.5, < 3.10)
+  listen (>= 3.0.5, < 3.11)
   paper_trail
   pg (>= 0.18, < 2.0)
   pry-byebug
