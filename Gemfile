@@ -53,6 +53,8 @@ gem 'async-redis'
 gem 'async-websocket'
 gem 'thread-local'
 
+gem 'rack-cors', require: 'rack/cors'
+
 group :development, :test do
   gem 'async-rspec'
   gem 'factory_bot_rails'
