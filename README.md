@@ -56,6 +56,14 @@ bin/attach             # Attach to rails for debugging with binding.pry
 bin/shell              # Shell into the rails container
 ```
 
+## Important ENV Vars
+
+These are ENV vars you can pass to your server when you start up the server that set up its behavior.
+
+### FRONTEND_HOST
+
+Sets up the allowed origin of the frontend, such as `'example.com'`
+
 ## Where's my API at
 
 View your API at http://localhost:3000/swagger

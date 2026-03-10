@@ -474,6 +474,9 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.2.5)
+    rack-cors (3.0.0)
+      logger
+      rack (>= 3.0.14)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -704,6 +707,7 @@ DEPENDENCIES
   paper_trail
   pg (>= 0.18, < 2.0)
   pry-byebug
+  rack-cors
   rails (~> 8)
   redis (~> 5.4)
   rspec-rails
