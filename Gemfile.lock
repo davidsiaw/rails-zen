@@ -160,7 +160,7 @@ GEM
       samovar (~> 2.1)
     base32-crockford (0.1.0)
     base64 (0.3.0)
-    bcrypt (3.1.21)
+    bcrypt (3.1.22)
     bigdecimal (4.0.1)
     bindex (0.8.1)
     bootsnap (1.23.0)
@@ -689,7 +689,7 @@ DEPENDENCIES
   async-redis
   async-rspec
   async-websocket
-  bcrypt (~> 3.1.21)
+  bcrypt (~> 3.1.22)
   bootsnap (>= 1.1.0)
   brakeman
   bundler-audit
