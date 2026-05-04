@@ -409,7 +409,7 @@ GEM
     nap (1.1.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
-    net-imap (0.6.3)
+    net-imap (0.6.4)
       date
       net-protocol
     net-pop (0.1.2)
@@ -645,7 +645,7 @@ GEM
       unicode-display_width (>= 1.1.1, < 4)
     thor (1.5.0)
     thread-local (1.1.0)
-    timeout (0.6.0)
+    timeout (0.6.1)
     traces (0.18.2)
     trailblazer-option (0.1.2)
     tsort (0.2.0)
