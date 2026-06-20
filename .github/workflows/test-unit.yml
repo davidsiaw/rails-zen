@@ -12,6 +12,7 @@ jobs:
         if: failure()
         run: |-
           docker compose logs rails
+          docker compose logs db
       - name: start recording
         run: |-
           docker compose -f docker-compose.unit.yml exec rz curl chromevideo:9494/start
