@@ -6,7 +6,7 @@ services:
     image: postgres:alpine
     container_name: db
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql
     environment:
       POSTGRES_PASSWORD: postgres
 
