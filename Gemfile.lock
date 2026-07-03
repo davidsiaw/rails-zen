@@ -330,7 +330,7 @@ GEM
     grape-swagger-entity (0.7.1)
       grape-entity (~> 1)
       grape-swagger (~> 2)
-    grape-swagger-rails (1.0.3)
+    grape-swagger-rails (1.0.4)
       haml-rails (>= 2.0, < 4.0)
       ostruct (>= 0.6, < 1.0)
       railties (>= 7.2.2.2, < 8.2)
