@@ -34,3 +34,5 @@
 .bundler/
 .cmdsh
 .pi-sessions/
+coverage/
+.pirag/
