@@ -20,7 +20,7 @@ jobs:
       - name: copy coverage report
         run: |-
           mkdir -p coverage
-          docker compose -f docker-compose.unit.yml cp rz:/rails/coverage/coverage.json ./coverage/coverage.json
+          docker compose -f docker-compose.unit.yml cp rz:/srv/coverage/coverage.json ./coverage/coverage.json
 
       - name: comment coverage on PR
         uses: actions/github-script@v9
