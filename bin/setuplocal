@@ -9,6 +9,7 @@
 #   bin/setuplocal [ruby_version]
 #
 # After setup, start the server with:
+#   source tmp/localenv.sh
 #   bin/rails server -u falcon -p 3000
 #
 set -euo pipefail
@@ -31,17 +32,30 @@ info "Checking Ruby..."
 
 # Accept optional Ruby version from argument, default 3.3.5
 TARGET_RUBY="${1:-3.3.5}"
-echo "$TARGET_RUBY" > "$APP_ROOT/.ruby-version"
 
-RUBY_BIN="$HOME/.local/share/mise/installs/ruby/$TARGET_RUBY/bin/ruby"
-if [ -x "$RUBY_BIN" ]; then
+# Fix 7 — resolve mise path, don't hardcode $HOME
+MISE_RUBY="$(mise where ruby@$TARGET_RUBY 2>/dev/null || true)"
+if [ -n "$MISE_RUBY" ] && [ -x "$MISE_RUBY/bin/ruby" ]; then
+  export PATH="$MISE_RUBY/bin:$PATH"
+elif [ -x "$HOME/.local/share/mise/installs/ruby/$TARGET_RUBY/bin/ruby" ]; then
   export PATH="$HOME/.local/share/mise/installs/ruby/$TARGET_RUBY/bin:$PATH"
 elif command -v ruby &>/dev/null; then
-  warn "Ruby $TARGET_RUBY not found at mise path, using system ruby."
+  warn "Ruby $TARGET_RUBY not found via mise, using system ruby."
 else
   fail "Ruby not found. Install with: mise install ruby@$TARGET_RUBY"
 fi
 info "Ruby $(ruby --version | awk '{print $2}')"
+
+# Fix 1 — reject dev-build Rubies (the actual bug)
+if [ "$(ruby -e 'print RUBY_PATCHLEVEL')" -lt 0 ]; then
+  fail "Ruby $TARGET_RUBY is a development build ($(ruby -v)).
+Precompiled native gems (pg, nokogiri) cannot load against dev builds
+(undefined symbol: ruby_abi_version).
+Use a released version instead."
+fi
+
+# Fix 2 — write .ruby-version only after dev-build validation passes
+echo "$TARGET_RUBY" > "$APP_ROOT/.ruby-version"
 
 # ── 2. System dependencies ──────────────────────────────────────────────────
 info "Installing system dependencies..."
@@ -51,8 +65,9 @@ NEED_PG=true
 NEED_REDIS=true
 NEED_CHROME=true
 
-if command -v psql &>/dev/null; then
-  info "PostgreSQL client already present, skipping install."
+# Fix 4 — postgres detection checks the server, not the client
+if command -v pg_ctlcluster &>/dev/null && command -v psql &>/dev/null; then
+  info "PostgreSQL server already present, skipping install."
   NEED_PG=false
 fi
 if command -v redis-server &>/dev/null; then
@@ -67,7 +82,8 @@ fi
 if [ "$NEED_PG" = true ] || [ "$NEED_REDIS" = true ] || [ "$NEED_CHROME" = true ]; then
   sudo apt-get update -qq
   PKGS=""
-  [ "$NEED_PG" = true ] && PKGS="$PKGS postgresql postgresql-client"
+  # Fix 3 — add libpq-dev
+  [ "$NEED_PG" = true ] && PKGS="$PKGS postgresql postgresql-client libpq-dev"
   [ "$NEED_REDIS" = true ] && PKGS="$PKGS redis-server"
   [ "$NEED_CHROME" = true ] && PKGS="$PKGS chromium chromium-driver"
   sudo apt-get install -y -qq $PKGS 2>&1 | tail -1
@@ -104,7 +120,8 @@ if [ -n "$PG_CONF" ]; then
   sudo pg_ctlcluster "$PG_VER" "$PG_CLUSTER" reload 2>/dev/null || true
 fi
 
-su - postgres -c "psql -c \"ALTER USER postgres PASSWORD 'postgres';\"" 2>/dev/null || true
+# Fix 5 — sudo -u postgres instead of su - postgres
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';" 2>/dev/null || true
 
 for i in $(seq 1 30); do
   pg_isready -q && break
@@ -181,6 +198,14 @@ bundle exec rails db:create db:migrate db:seed RAILS_ENV=development 2>&1 | whil
 info "Setting up test database..."
 bundle exec rails db:create db:migrate RAILS_ENV=test 2>&1 | while IFS= read -r line; do echo "  $line"; done
 
+# Fix 6 — emit an env file for use in a fresh shell
+cat > "$APP_ROOT/tmp/localenv.sh" <<EOF
+export PATH="$(dirname "$(command -v ruby)"):\$PATH"
+export DATABASE_URL="$DATABASE_URL"
+export REDIS_URL="$REDIS_URL"
+export RUBYOPT="-r$CONTAINER_PATCH"
+EOF
+
 # ── Done ─────────────────────────────────────────────────────────────────────
 echo ""
 echo "========================================="
@@ -188,12 +213,10 @@ echo "  Setup complete!"
 echo "========================================="
 echo ""
 echo "  Start the server:"
+echo "    source tmp/localenv.sh"
 echo "    bin/rails server -u falcon -p 3000"
 echo ""
 echo "  Run tests:"
-echo "    bin/rails spec"
-echo ""
-echo "  Environment:"
-echo "    DATABASE_URL=$DATABASE_URL"
-echo "    REDIS_URL=$REDIS_URL"
+echo "    source tmp/localenv.sh"
+echo "    bundle exec rspec"
 echo ""
