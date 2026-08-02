@@ -2,7 +2,8 @@
 # frozen_string_literal: false
 #
 # Prepares this Rails project to run locally inside a pa-style sandbox container.
-# Installs system deps (PostgreSQL, Redis), starts them, bundles gems, and sets up the DB.
+# Installs system deps (PostgreSQL, Redis, Chromium), starts them, bundles gems,
+# and sets up the DB.
 #
 # Usage:
 #   bin/setuplocal [ruby_version]
@@ -48,6 +49,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 NEED_PG=true
 NEED_REDIS=true
+NEED_CHROME=true
 
 if command -v psql &>/dev/null; then
   info "PostgreSQL client already present, skipping install."
@@ -57,12 +59,17 @@ if command -v redis-server &>/dev/null; then
   info "Redis already present, skipping install."
   NEED_REDIS=false
 fi
+if command -v chromium &>/dev/null; then
+  info "Chromium already present, skipping install."
+  NEED_CHROME=false
+fi
 
-if [ "$NEED_PG" = true ] || [ "$NEED_REDIS" = true ]; then
+if [ "$NEED_PG" = true ] || [ "$NEED_REDIS" = true ] || [ "$NEED_CHROME" = true ]; then
   sudo apt-get update -qq
   PKGS=""
   [ "$NEED_PG" = true ] && PKGS="$PKGS postgresql postgresql-client"
   [ "$NEED_REDIS" = true ] && PKGS="$PKGS redis-server"
+  [ "$NEED_CHROME" = true ] && PKGS="$PKGS chromium chromium-driver"
   sudo apt-get install -y -qq $PKGS 2>&1 | tail -1
 fi
 
@@ -138,18 +145,31 @@ else
   info "Master key already exists."
 fi
 
-# ── 6b. Force listen into polling mode ──────────────────────────────────────
-# The sandbox shares the host inotify pool which is exhausted.
-# Listen supports force_polling but Rails doesn't expose it, so we
-# monkey-patch Listen::Adapter::Linux before any Rails code loads.
-LISTEN_PATCH="$APP_ROOT/tmp/listen_polling.rb"
+# ── 6b. Container patches (RUBYOPT) ─────────────────────────────────────────
+# Two monkey-patches needed in the sandbox:
+#   1. listen gem → force polling (host inotify pool exhausted)
+#   2. Chrome → headless + no-sandbox (no display, unprivileged user)
+CONTAINER_PATCH="$APP_ROOT/tmp/container_patches.rb"
 mkdir -p "$APP_ROOT/tmp"
-cat > "$LISTEN_PATCH" <<'RUBY'
+cat > "$CONTAINER_PATCH" <<'RUBY'
+# Force listen into polling mode (inotify exhausted in container)
 require "listen"
 Listen::Adapter.class_eval { def self.select(_options = {}); Listen::Adapter::Polling; end }
+
+# Force Chrome headless + no-sandbox for container environments
+require "selenium/webdriver"
+Selenium::WebDriver::Chrome::Options.prepend(Module.new do
+  def initialize(*)
+    super
+    add_argument("--headless=new")
+    add_argument("--no-sandbox")
+    add_argument("--disable-gpu")
+    add_argument("--disable-dev-shm-usage")
+  end
+end)
 RUBY
-export RUBYOPT="-r$LISTEN_PATCH${RUBYOPT:+ $RUBYOPT}"
-info "Patched listen gem → polling mode (inotify exhausted in container)"
+export RUBYOPT="-r$CONTAINER_PATCH${RUBYOPT:+ $RUBYOPT}"
+info "Patched listen → polling, Chrome → headless+no-sandbox"
 
 # ── 7. Database setup ───────────────────────────────────────────────────────
 export DATABASE_URL="postgres://postgres:postgres@127.0.0.1"
