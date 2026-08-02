@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# frozen_string_literal: false
+#
+# Prepares this Rails project to run locally inside a pa-style sandbox container.
+# Installs system deps (PostgreSQL, Redis), starts them, bundles gems, and sets up the DB.
+#
+# Usage:
+#   bin/setuplocal [ruby_version]
+#
+# After setup, start the server with:
+#   bin/rails server -u falcon -p 3000
+#
+set -euo pipefail
+
+APP_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$APP_ROOT"
+
+# ── Colours ──────────────────────────────────────────────────────────────────
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+info()  { echo -e "${GREEN}[setuplocal]${NC} $*"; }
+warn()  { echo -e "${YELLOW}[setuplocal]${NC} $*"; }
+fail()  { echo -e "${RED}[setuplocal]${NC} $*"; exit 1; }
+
+# ── 1. Ruby via mise ────────────────────────────────────────────────────────
+info "Checking Ruby..."
+
+# Accept optional Ruby version from argument, default 3.3.5
+TARGET_RUBY="${1:-3.3.5}"
+echo "$TARGET_RUBY" > "$APP_ROOT/.ruby-version"
+
+RUBY_BIN="$HOME/.local/share/mise/installs/ruby/$TARGET_RUBY/bin/ruby"
+if [ -x "$RUBY_BIN" ]; then
+  export PATH="$HOME/.local/share/mise/installs/ruby/$TARGET_RUBY/bin:$PATH"
+elif command -v ruby &>/dev/null; then
+  warn "Ruby $TARGET_RUBY not found at mise path, using system ruby."
+else
+  fail "Ruby not found. Install with: mise install ruby@$TARGET_RUBY"
+fi
+info "Ruby $(ruby --version | awk '{print $2}')"
+
+# ── 2. System dependencies ──────────────────────────────────────────────────
+info "Installing system dependencies..."
+export DEBIAN_FRONTEND=noninteractive
+
+NEED_PG=true
+NEED_REDIS=true
+
+if command -v psql &>/dev/null; then
+  info "PostgreSQL client already present, skipping install."
+  NEED_PG=false
+fi
+if command -v redis-server &>/dev/null; then
+  info "Redis already present, skipping install."
+  NEED_REDIS=false
+fi
+
+if [ "$NEED_PG" = true ] || [ "$NEED_REDIS" = true ]; then
+  sudo apt-get update -qq
+  PKGS=""
+  [ "$NEED_PG" = true ] && PKGS="$PKGS postgresql postgresql-client"
+  [ "$NEED_REDIS" = true ] && PKGS="$PKGS redis-server"
+  sudo apt-get install -y -qq $PKGS 2>&1 | tail -1
+fi
+
+# ── 3. Start PostgreSQL ─────────────────────────────────────────────────────
+info "Starting PostgreSQL..."
+
+PG_VER=$(pg_lsclusters --no-header 2>/dev/null | awk 'NR==1{print $1}') || true
+PG_CLUSTER=$(pg_lsclusters --no-header 2>/dev/null | awk 'NR==1{print $2}') || true
+
+if [ -n "$PG_VER" ] && [ -n "$PG_CLUSTER" ]; then
+  STATUS=$(pg_lsclusters --no-header 2>/dev/null | awk 'NR==1{print $4}') || true
+  if [ "$STATUS" != "online" ]; then
+    sudo pg_ctlcluster "$PG_VER" "$PG_CLUSTER" start 2>&1 | tail -3
+  else
+    info "PostgreSQL already running."
+  fi
+else
+  PG_VER=$(psql --version | awk '{print $3}' | cut -d. -f1)
+  sudo pg_createcluster "$PG_VER" main --start 2>&1 | tail -3
+  PG_CLUSTER="main"
+fi
+
+# Allow password auth for local TCP connections (dev convenience)
+PG_CONF=$(find /etc/postgresql -name pg_hba.conf 2>/dev/null | head -1)
+if [ -n "$PG_CONF" ]; then
+  sudo sed -i \
+    -e 's/^local\s\+all\s\+all\s\+peer/local   all             all                                     trust/' \
+    -e 's/^local\s\+all\s\+all\s\+scram-sha-256/local   all             all                                     trust/' \
+    -e 's/^host\s\+all\s\+all\s\+127\.0\.0\.1\/32\s\+scram-sha-256/host    all             all             127.0.0.1\/32            trust/' \
+    -e 's/^host\s\+all\s\+all\s\+::1\/128\s\+scram-sha-256/host    all             all             ::1\/128                 trust/' \
+    "$PG_CONF" 2>/dev/null || true
+  sudo pg_ctlcluster "$PG_VER" "$PG_CLUSTER" reload 2>/dev/null || true
+fi
+
+su - postgres -c "psql -c \"ALTER USER postgres PASSWORD 'postgres';\"" 2>/dev/null || true
+
+for i in $(seq 1 30); do
+  pg_isready -q && break
+  sleep 1
+done
+pg_isready -q || fail "PostgreSQL failed to start."
+info "PostgreSQL ready."
+
+# ── 4. Start Redis ──────────────────────────────────────────────────────────
+info "Starting Redis..."
+if redis-cli ping 2>/dev/null | grep -q PONG; then
+  info "Redis already running."
+else
+  redis-server --daemonize yes --loglevel warning 2>/dev/null || \
+    sudo redis-server --daemonize yes --loglevel warning 2>/dev/null || \
+    fail "Redis failed to start."
+fi
+redis-cli ping | grep -q PONG || fail "Redis failed to start."
+info "Redis ready."
+
+# ── 5. Bundle install ───────────────────────────────────────────────────────
+info "Installing Ruby gems..."
+bundle check -q 2>/dev/null || bundle install
+
+# ── 6. Rails master key (credentials) ───────────────────────────────────────
+if [ ! -f "$APP_ROOT/config/master.key" ]; then
+  info "Generating master key for credentials..."
+  KEY=$(ruby -rsecurerandom -e 'puts SecureRandom.hex(16)')
+  echo "$KEY" > "$APP_ROOT/config/master.key"
+
+  if [ -f "$APP_ROOT/config/credentials.yml.enc" ]; then
+    info "Removing stale credentials.yml.enc (key mismatch)..."
+    rm -f "$APP_ROOT/config/credentials.yml.enc"
+  fi
+
+  info "Master key written to config/master.key"
+else
+  info "Master key already exists."
+fi
+
+# ── 6b. Force listen into polling mode ──────────────────────────────────────
+# The sandbox shares the host inotify pool which is exhausted.
+# Listen supports force_polling but Rails doesn't expose it, so we
+# monkey-patch Listen::Adapter::Linux before any Rails code loads.
+LISTEN_PATCH="$APP_ROOT/tmp/listen_polling.rb"
+mkdir -p "$APP_ROOT/tmp"
+cat > "$LISTEN_PATCH" <<'RUBY'
+require "listen"
+Listen::Adapter.class_eval { def self.select(_options = {}); Listen::Adapter::Polling; end }
+RUBY
+export RUBYOPT="-r$LISTEN_PATCH${RUBYOPT:+ $RUBYOPT}"
+info "Patched listen gem → polling mode (inotify exhausted in container)"
+
+# ── 7. Database setup ───────────────────────────────────────────────────────
+export DATABASE_URL="postgres://postgres:postgres@127.0.0.1"
+export REDIS_URL="redis://127.0.0.1:6379/0"
+
+info "Setting up development database..."
+bundle exec rails db:create db:migrate db:seed RAILS_ENV=development 2>&1 | while IFS= read -r line; do echo "  $line"; done
+
+info "Setting up test database..."
+bundle exec rails db:create db:migrate RAILS_ENV=test 2>&1 | while IFS= read -r line; do echo "  $line"; done
+
+# ── Done ─────────────────────────────────────────────────────────────────────
+echo ""
+echo "========================================="
+echo "  Setup complete!"
+echo "========================================="
+echo ""
+echo "  Start the server:"
+echo "    bin/rails server -u falcon -p 3000"
+echo ""
+echo "  Run tests:"
+echo "    bin/rails spec"
+echo ""
+echo "  Environment:"
+echo "    DATABASE_URL=$DATABASE_URL"
+echo "    REDIS_URL=$REDIS_URL"
+echo ""
