@@ -66,9 +66,8 @@ group :test do
   gem 'database_cleaner'
   gem 'falcon-capybara'
   gem 'rspec_junit_formatter'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '>= 4.14.0'
   gem 'shoulda-matchers'
-  gem 'webdrivers'
 end
 
 group :bundleraudit, :development do
