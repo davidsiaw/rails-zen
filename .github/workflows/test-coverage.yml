@@ -1,0 +1,36 @@
+name: test-coverage
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: compose up
+        run: |-
+          PUID="$(id -u)" PGID="$(id -g)" docker compose -f docker-compose.unit.yml up -d --wait --build
+
+      - name: run tests
+        run: |-
+          docker compose -f docker-compose.unit.yml exec rz rspec
+
+      - name: copy coverage report
+        run: |-
+          mkdir -p coverage
+          docker compose -f docker-compose.unit.yml cp rz:/srv/coverage/.resultset.json ./coverage/.resultset.json
+
+      - name: check simplecov coverage
+        uses: alexremn/simplecov-github-action@v1
+        with:
+          minimum_suite_coverage: 66
+          coverage_path: coverage/.resultset.json
+          post_comment: true
+          update_comment: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}

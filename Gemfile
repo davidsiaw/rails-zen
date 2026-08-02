@@ -68,6 +68,7 @@ group :test do
   gem 'rspec_junit_formatter'
   gem 'selenium-webdriver', '>= 4.14.0'
   gem 'shoulda-matchers'
+  gem 'simplecov', require: false
 end
 
 group :bundleraudit, :development do

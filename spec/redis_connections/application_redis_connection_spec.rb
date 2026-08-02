@@ -23,4 +23,24 @@ RSpec.describe ApplicationRedisConnection do
       obj.publish('foobar')
     end
   end
+
+  describe '#close' do
+    it 'stops and clears the async task' do
+      task_double = double('AsyncTask')
+      obj = described_class.new('test_channel')
+      obj.instance_variable_set(:@async_task, task_double)
+
+      expect(task_double).to receive(:stop)
+      obj.close
+
+      expect(obj.instance_variable_get(:@async_task)).to be_nil
+    end
+
+    it 'does nothing when async_task is nil' do
+      obj = described_class.new('test_channel')
+      obj.instance_variable_set(:@async_task, nil)
+
+      expect { obj.close }.not_to raise_error
+    end
+  end
 end
