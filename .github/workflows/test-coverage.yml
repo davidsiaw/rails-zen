@@ -29,6 +29,7 @@ jobs:
       - name: check simplecov coverage
         uses: alexremn/simplecov-github-action@v1
         with:
+          minimum_suite_coverage: 66
           coverage_path: coverage/.resultset.json
           post_comment: true
           update_comment: true

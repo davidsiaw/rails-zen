@@ -6,6 +6,7 @@ ENV['RAILS_ENV'] = 'test'
 require 'simplecov'
 SimpleCov.start 'rails' do
   skip '/spec/'
+  skip '/lib/'
   formatters [SimpleCov::Formatter::HTMLFormatter, SimpleCov::Formatter::JSONFormatter]
 end
 
