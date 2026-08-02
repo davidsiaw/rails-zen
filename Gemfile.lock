@@ -315,7 +315,7 @@ GEM
       rchardet (~> 1.9)
     globalid (1.4.0)
       activesupport (>= 6.1)
-    grape (3.3.0)
+    grape (3.3.4)
       activesupport (>= 7.2)
       dry-configurable (>= 1.0)
       dry-types (>= 1.1)
