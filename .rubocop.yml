@@ -12,7 +12,9 @@ AllCops:
   TargetRubyVersion: 3.4
   Exclude:
     - 'db/migrate/*.rb'
+    - 'db/schema.rb'
     - 'lib/templates/**/*'
+    - 'tmp/**/*'
     - 'vendor/**/*'
     - bin/setup
     - bin/update
@@ -26,7 +28,6 @@ Style/Documentation:
 Metrics/BlockLength:
   Exclude:
     - 'config/**/*'
-    - 'db/schema.rb'
 
 Layout/LineLength:
   Exclude:
