@@ -1,0 +1,55 @@
+# Build context allowlist.
+#
+# Everything is excluded, then the paths the Dockerfiles actually ADD are
+# re-included. Same reasoning as BUNDLE_ONLY in docs/HARDENING.md §2.2: a
+# denylist fails open (forget to add a line, junk ships silently), an allowlist
+# fails closed and loudly (forget a line, the build errors on a missing path).
+#
+# Two Dockerfiles share this context:
+#   Dockerfile             — the app image (docker-compose.yml, Steerfile)
+#   docker/unit/Dockerfile — the all-in-one test image (docker-compose.unit.yml)
+#
+# If you add an ADD/COPY line to either, add the path here too or the build
+# will fail with "failed to compute cache key: not found".
+
+*
+
+# --- files ADDed to /srv ---------------------------------------------------
+!Gemfile
+!Gemfile.lock
+!Rakefile
+!package.json
+!config.ru
+!.rspec
+!.rubocop.yml
+!.rubocop_todo.yml
+
+# --- directories ADDed to /srv ---------------------------------------------
+!app
+!bin
+!config
+!db
+!lib
+!log
+!public
+!spec
+!vendor
+
+# docker/unit/{start.sh,waitpg.sh,waitredis.sh,Procfile} for the unit image
+!docker
+
+# --- re-excluded from within the above -------------------------------------
+
+# Decrypts config/credentials.yml.enc. Gitignored, so CI never has it, but a
+# developer building locally would otherwise bake their key into the image.
+# Pass RAILS_MASTER_KEY at runtime instead.
+config/master.key
+
+# Local runtime droppings that would bust the layer cache on every build.
+log/*.log
+public/assets
+**/.DS_Store
+
+# Note: spec/ is intentionally still included, because Dockerfile has
+# `ADD spec /srv/spec`. Removing the test suite from the runtime image is step
+# 1 of docs/HARDENING.md — delete that ADD line and the !spec above together.
