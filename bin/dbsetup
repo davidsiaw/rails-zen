@@ -1,6 +1,22 @@
 #!/bin/sh
+#
+# Provision the development and test databases.
+#
+# Callers assume postgres is already accepting connections: docker-compose.yml
+# gates the rails_startup service on `condition: service_healthy`, and
+# docker/unit/Procfile runs waitpg.sh first. This script does not wait.
+
+# Without this, sh reports only the exit status of the *last* command, so a
+# failed migrate is invisible and the caller sees success. Heighliner then
+# snapshots the half-built result as its default database image and reuses it
+# on every subsequent `up` -- a silent, permanent breakage.
+set -e
 
 rails db:create
 rails db:migrate
 rails db:seed
-rails db:create RAILS_ENV=test
+
+# `db:create` alone leaves the test database empty: it creates it but loads no
+# schema, so the first spec to run dies in maintain_test_schema! with a missing
+# relation. db:schema:load is what actually populates it.
+rails db:create db:schema:load RAILS_ENV=test
