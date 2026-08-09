@@ -3,6 +3,11 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
+# Ruby < 3.3.7 has a Mutex/ConditionVariable bug (bugs.ruby-lang.org/issues/20907)
+# that surfaces as "Attempt to unlock a mutex which is not locked" from Async
+# during fiber scheduler cancellation. Fixed in 3.2.7+/3.3.7+/3.4+; we require 3.4.
+ruby '>= 3.4'
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 8'
 # Use postgresql as the database for Active Record

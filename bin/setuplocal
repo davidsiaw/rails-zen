@@ -30,8 +30,11 @@ fail()  { echo -e "${RED}[setuplocal]${NC} $*"; exit 1; }
 # ── 1. Ruby via mise ────────────────────────────────────────────────────────
 info "Checking Ruby..."
 
-# Accept optional Ruby version from argument, default 3.3.5
-TARGET_RUBY="${1:-3.3.5}"
+# Accept optional Ruby version from argument, default 3.4.10
+# Minimum is 3.4 -- see the MINIMUM_RUBY check below for why.
+DEFAULT_RUBY="3.4.10"
+TARGET_RUBY="${1:-$DEFAULT_RUBY}"
+MINIMUM_RUBY="3.4"
 
 # Resolve mise path
 MISE_RUBY="$(mise where ruby@$TARGET_RUBY 2>/dev/null || true)"
@@ -54,7 +57,17 @@ Precompiled native gems (pg, nokogiri) cannot load against dev builds
 Use a released version instead."
 fi
 
-# Write .ruby-version only after dev-build validation passes
+# Enforce the minimum Ruby. Checks the *running* ruby, not TARGET_RUBY, because
+# the block above may have fallen back to system ruby.
+if ! ruby -e "exit Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('$MINIMUM_RUBY')"; then
+  fail "Ruby $(ruby -e 'print RUBY_VERSION') is too old; this project requires >= $MINIMUM_RUBY.
+Ruby < 3.3.7 has a Mutex/ConditionVariable bug (https://bugs.ruby-lang.org/issues/20907)
+that makes Async raise 'Attempt to unlock a mutex which is not locked' during
+fiber scheduler cancellation, producing spurious errors on Falcon teardown.
+Install a supported Ruby with: mise install ruby@$DEFAULT_RUBY"
+fi
+
+# Write .ruby-version only after all validation passes
 echo "$TARGET_RUBY" > "$APP_ROOT/.ruby-version"
 
 # ── 2. System dependencies (pa-apt, no sudo) ────────────────────────────────
