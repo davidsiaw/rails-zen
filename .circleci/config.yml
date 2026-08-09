@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: cimg/ruby:3.3.1-node
+      - image: cimg/ruby:3.4.10-node
         environment:
           RAILS_ENV: test
           BUILDKIT_PROGRESS: plain
@@ -90,7 +90,7 @@ jobs:
   build-unit:
     docker:
       # specify the version you desire here
-      - image: cimg/ruby:3.3.1-node
+      - image: cimg/ruby:3.4.10-node
         environment:
           RAILS_ENV: test
           BUILDKIT_PROGRESS: plain
@@ -180,7 +180,7 @@ jobs:
 
   brakeman:
     docker:
-      - image: cimg/ruby:3.3.1-node
+      - image: cimg/ruby:3.4.10-node
         environment:
           RAILS_ENV: development
           BUNDLE_ONLY: brakeman
@@ -195,7 +195,7 @@ jobs:
 
   bundler-audit:
     docker:
-      - image: cimg/ruby:3.3.1-node
+      - image: cimg/ruby:3.4.10-node
         environment:
           RAILS_ENV: development
           BUNDLE_ONLY: bundleraudit
@@ -210,7 +210,7 @@ jobs:
 
   rubocop:
     docker:
-      - image: cimg/ruby:3.3.1-node
+      - image: cimg/ruby:3.4.10-node
         environment:
           RAILS_ENV: development
           BUNDLE_ONLY: rubocop
@@ -224,7 +224,7 @@ jobs:
 
   danger:
     docker:
-      - image: cimg/ruby:3.3.1-node
+      - image: cimg/ruby:3.4.10-node
         environment:
           RAILS_ENV: development
           BUNDLE_ONLY: danger
