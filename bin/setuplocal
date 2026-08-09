@@ -2,8 +2,8 @@
 # frozen_string_literal: false
 #
 # Prepares this Rails project to run locally inside a pa-style sandbox container.
-# Installs system deps (PostgreSQL, Redis, Chromium), starts them, bundles gems,
-# and sets up the DB.
+# Installs system deps (PostgreSQL, Redis, Chromium) via pa-apt, starts them,
+# bundles gems, and sets up the DB.
 #
 # Usage:
 #   bin/setuplocal [ruby_version]
@@ -33,7 +33,7 @@ info "Checking Ruby..."
 # Accept optional Ruby version from argument, default 3.3.5
 TARGET_RUBY="${1:-3.3.5}"
 
-# Fix 7 — resolve mise path, don't hardcode $HOME
+# Resolve mise path
 MISE_RUBY="$(mise where ruby@$TARGET_RUBY 2>/dev/null || true)"
 if [ -n "$MISE_RUBY" ] && [ -x "$MISE_RUBY/bin/ruby" ]; then
   export PATH="$MISE_RUBY/bin:$PATH"
@@ -42,11 +42,11 @@ elif [ -x "$HOME/.local/share/mise/installs/ruby/$TARGET_RUBY/bin/ruby" ]; then
 elif command -v ruby &>/dev/null; then
   warn "Ruby $TARGET_RUBY not found via mise, using system ruby."
 else
-  fail "Ruby not found. Install with: mise install ruby@$TARGET_RUBY"
+  fail "Ruby $TARGET_RUBY not found. Install with: mise install ruby@$TARGET_RUBY"
 fi
 info "Ruby $(ruby --version | awk '{print $2}')"
 
-# Fix 1 — reject dev-build Rubies (the actual bug)
+# Reject dev-build Rubies (precompiled native gems fail against dev builds)
 if [ "$(ruby -e 'print RUBY_PATCHLEVEL')" -lt 0 ]; then
   fail "Ruby $TARGET_RUBY is a development build ($(ruby -v)).
 Precompiled native gems (pg, nokogiri) cannot load against dev builds
@@ -54,80 +54,86 @@ Precompiled native gems (pg, nokogiri) cannot load against dev builds
 Use a released version instead."
 fi
 
-# Fix 2 — write .ruby-version only after dev-build validation passes
+# Write .ruby-version only after dev-build validation passes
 echo "$TARGET_RUBY" > "$APP_ROOT/.ruby-version"
 
-# ── 2. System dependencies ──────────────────────────────────────────────────
+# ── 2. System dependencies (pa-apt, no sudo) ────────────────────────────────
 info "Installing system dependencies..."
-export DEBIAN_FRONTEND=noninteractive
 
-NEED_PG=true
-NEED_REDIS=true
-NEED_CHROME=true
+NEED_PG=false
+NEED_REDIS=false
+NEED_CHROME=false
 
-# Fix 4 — postgres detection checks the server, not the client
-if command -v pg_ctlcluster &>/dev/null && command -v psql &>/dev/null; then
-  info "PostgreSQL server already present, skipping install."
-  NEED_PG=false
+# Check if already installed (pa-apt puts binaries on PATH)
+# Note: initdb is under /usr/lib/postgresql/X/bin/ (not on PATH), so check psql instead
+if ! command -v psql &>/dev/null; then
+  NEED_PG=true
 fi
-if command -v redis-server &>/dev/null; then
-  info "Redis already present, skipping install."
-  NEED_REDIS=false
+if ! command -v redis-server &>/dev/null; then
+  NEED_REDIS=true
 fi
-if command -v chromium &>/dev/null; then
-  info "Chromium already present, skipping install."
-  NEED_CHROME=false
+if ! command -v chromium &>/dev/null; then
+  NEED_CHROME=true
 fi
 
 if [ "$NEED_PG" = true ] || [ "$NEED_REDIS" = true ] || [ "$NEED_CHROME" = true ]; then
-  sudo apt-get update -qq
-  PKGS=""
-  # Fix 3 — add libpq-dev
-  [ "$NEED_PG" = true ] && PKGS="$PKGS postgresql postgresql-client libpq-dev"
-  [ "$NEED_REDIS" = true ] && PKGS="$PKGS redis-server"
-  [ "$NEED_CHROME" = true ] && PKGS="$PKGS chromium chromium-driver"
-  sudo apt-get install -y -qq $PKGS 2>&1 | tail -1
+  if [ "$NEED_PG" = true ]; then
+    info "Installing PostgreSQL..."
+    pa-apt install postgresql 2>&1 | tail -3 || true
+  fi
+  if [ "$NEED_REDIS" = true ]; then
+    info "Installing Redis..."
+    pa-apt install redis 2>&1 | tail -3 || true
+  fi
+  if [ "$NEED_CHROME" = true ]; then
+    info "Installing Chromium..."
+    pa-apt install chromium 2>&1 | tail -3 || true
+  fi
 fi
 
 # ── 3. Start PostgreSQL ─────────────────────────────────────────────────────
 info "Starting PostgreSQL..."
 
-PG_VER=$(pg_lsclusters --no-header 2>/dev/null | awk 'NR==1{print $1}') || true
-PG_CLUSTER=$(pg_lsclusters --no-header 2>/dev/null | awk 'NR==1{print $2}') || true
+# Find the PostgreSQL version from the installed libraries
+PA_APT_ROOT="$(pa-apt path 2>/dev/null)" || PA_APT_ROOT="$HOME/.local/pa-apt"
+PG_LIB_DIR="$(find "$PA_APT_ROOT/usr/lib/postgresql" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | head -1)" || true
+if [ -z "$PG_LIB_DIR" ]; then
+  fail "Cannot find PostgreSQL installation. Check pa-apt install postgresql."
+fi
+PG_BIN="$PG_LIB_DIR/bin"
 
-if [ -n "$PG_VER" ] && [ -n "$PG_CLUSTER" ]; then
-  STATUS=$(pg_lsclusters --no-header 2>/dev/null | awk 'NR==1{print $4}') || true
-  if [ "$STATUS" != "online" ]; then
-    sudo pg_ctlcluster "$PG_VER" "$PG_CLUSTER" start 2>&1 | tail -3
-  else
-    info "PostgreSQL already running."
-  fi
+# User-writable directories for data and sockets (no /var/run or sudo)
+PG_DATA="$HOME/.local/pgdata"
+PG_RUN="$HOME/.local/pg-run"
+mkdir -p "$PG_DATA" "$PG_RUN"
+
+# Check if a cluster already exists at PG_DATA
+if [ ! -f "$PG_DATA/PG_VERSION" ]; then
+  info "Initializing PostgreSQL cluster..."
+  "$PG_BIN/initdb" -D "$PG_DATA" --auth=trust --encoding=UTF8 > /dev/null 2>&1
+
+  # Configure user-writable socket directory (avoids /var/run permission issues)
+  echo "unix_socket_directories = '$PG_RUN'" >> "$PG_DATA/postgresql.conf"
+fi
+
+# Start the server
+if "$PG_BIN/pg_isready" -h "$PG_RUN" -q 2>/dev/null; then
+  info "PostgreSQL already running."
 else
-  PG_VER=$(psql --version | awk '{print $3}' | cut -d. -f1)
-  sudo pg_createcluster "$PG_VER" main --start 2>&1 | tail -3
-  PG_CLUSTER="main"
+  info "Starting PostgreSQL server..."
+  "$PG_BIN/pg_ctl" -D "$PG_DATA" -l "$PG_DATA/logfile" start 2>&1 | tail -3
 fi
 
-# Allow password auth for local TCP connections (dev convenience)
-PG_CONF=$(find /etc/postgresql -name pg_hba.conf 2>/dev/null | head -1)
-if [ -n "$PG_CONF" ]; then
-  sudo sed -i \
-    -e 's/^local\s\+all\s\+all\s\+peer/local   all             all                                     trust/' \
-    -e 's/^local\s\+all\s\+all\s\+scram-sha-256/local   all             all                                     trust/' \
-    -e 's/^host\s\+all\s\+all\s\+127\.0\.0\.1\/32\s\+scram-sha-256/host    all             all             127.0.0.1\/32            trust/' \
-    -e 's/^host\s\+all\s\+all\s\+::1\/128\s\+scram-sha-256/host    all             all             ::1\/128                 trust/' \
-    "$PG_CONF" 2>/dev/null || true
-  sudo pg_ctlcluster "$PG_VER" "$PG_CLUSTER" reload 2>/dev/null || true
-fi
+# Create 'postgres' role if it doesn't exist (initdb creates a role matching
+# the OS user, but Rails expects 'postgres' by convention)
+"$PG_BIN/createuser" -h "$PG_RUN" -s postgres 2>/dev/null || true
 
-# Fix 5 — sudo -u postgres instead of su - postgres
-sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';" 2>/dev/null || true
-
+# Wait for readiness
 for i in $(seq 1 30); do
-  pg_isready -q && break
+  "$PG_BIN/pg_isready" -h "$PG_RUN" -q && break
   sleep 1
 done
-pg_isready -q || fail "PostgreSQL failed to start."
+"$PG_BIN/pg_isready" -h "$PG_RUN" -q || fail "PostgreSQL failed to start."
 info "PostgreSQL ready."
 
 # ── 4. Start Redis ──────────────────────────────────────────────────────────
@@ -136,7 +142,6 @@ if redis-cli ping 2>/dev/null | grep -q PONG; then
   info "Redis already running."
 else
   redis-server --daemonize yes --loglevel warning 2>/dev/null || \
-    sudo redis-server --daemonize yes --loglevel warning 2>/dev/null || \
     fail "Redis failed to start."
 fi
 redis-cli ping | grep -q PONG || fail "Redis failed to start."
@@ -144,7 +149,7 @@ info "Redis ready."
 
 # ── 5. Bundle install ───────────────────────────────────────────────────────
 info "Installing Ruby gems..."
-bundle check -q 2>/dev/null || bundle install
+bundle check 2>/dev/null || bundle install
 
 # ── 6. Rails master key (credentials) ───────────────────────────────────────
 if [ ! -f "$APP_ROOT/config/master.key" ]; then
@@ -189,7 +194,7 @@ export RUBYOPT="-r$CONTAINER_PATCH${RUBYOPT:+ $RUBYOPT}"
 info "Patched listen → polling, Chrome → headless+no-sandbox"
 
 # ── 7. Database setup ───────────────────────────────────────────────────────
-export DATABASE_URL="postgres://postgres:postgres@127.0.0.1"
+export DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432"
 export REDIS_URL="redis://127.0.0.1:6379/0"
 
 info "Setting up development database..."
@@ -198,7 +203,7 @@ bundle exec rails db:create db:migrate db:seed RAILS_ENV=development 2>&1 | whil
 info "Setting up test database..."
 bundle exec rails db:create db:migrate RAILS_ENV=test 2>&1 | while IFS= read -r line; do echo "  $line"; done
 
-# Fix 6 — emit an env file for use in a fresh shell
+# ── 8. Emit env file for use in a fresh shell ───────────────────────────────
 cat > "$APP_ROOT/tmp/localenv.sh" <<EOF
 export PATH="$(dirname "$(command -v ruby)"):\$PATH"
 export DATABASE_URL="$DATABASE_URL"
