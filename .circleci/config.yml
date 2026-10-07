@@ -208,6 +208,45 @@ jobs:
             bundler-audit version
       - run: bundler-audit
 
+  osv-scanner:
+    docker:
+      - image: cimg/ruby:3.4.10-node
+    steps:
+      - checkout
+      - run:
+          name: install osv-scanner
+          command: |
+            curl -fsSL https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64 -o ~/osv-scanner
+            echo "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108  $HOME/osv-scanner" | sha256sum -c
+            chmod +x ~/osv-scanner
+            sudo mv ~/osv-scanner /usr/local/bin/osv-scanner
+            osv-scanner --version
+      - run: osv-scanner scan source -L Gemfile.lock
+
+  # Scans the built Docker image (Alpine packages and installed gems).
+  # Known false positives are ignored in .grype.yaml.
+  grype:
+    docker:
+      - image: cimg/ruby:3.4.10-node
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: docker24
+      - run:
+          name: install grype
+          command: |
+            curl -fsSL https://github.com/anchore/grype/releases/download/v0.120.1/grype_0.120.1_linux_amd64.tar.gz -o ~/grype.tar.gz
+            echo "0a9ee97ef5ae2ee953b0a80098105052e846cdbe319a57d808b519c33cd1343d  $HOME/grype.tar.gz" | sha256sum -c
+            tar -xzf ~/grype.tar.gz -C ~ grype
+            sudo mv ~/grype /usr/local/bin/grype
+            grype version
+      - run:
+          name: build image
+          command: |
+            docker build -t rails-zen:scan .
+            docker save rails-zen:scan -o /tmp/image.tar
+      - run: grype docker-archive:/tmp/image.tar --only-fixed --fail-on high
+
   rubocop:
     docker:
       - image: cimg/ruby:3.4.10-node
@@ -245,6 +284,8 @@ workflows:
       - build-unit
       - brakeman
       - bundler-audit
+      - osv-scanner
+      - grype
       - rubocop:
           filters:
             branches:
