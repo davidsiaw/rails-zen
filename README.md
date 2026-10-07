@@ -57,6 +57,57 @@ bin/attach             # Attach to rails for debugging with binding.pry
 bin/shell              # Shell into the rails container
 ```
 
+## Using Heighliner
+
+You can also run the dev stack with [Heighliner](https://davidsiaw.github.io/heighliner). It starts Postgres, Redis and the app, as set up in `Heighliner.config`.
+
+Set it up once:
+
+```
+heighliner init rails-zen
+```
+
+Then start everything:
+
+```
+heighliner up -av      # Build and start, with app/ config/ db/ lib/ spec/ mounted
+```
+
+`-a` mounts your source into the container, so edits show up right away. It stays in the foreground until you press control+c. If you change the `Gemfile` or `Dockerfile`, run `heighliner up` again to rebuild.
+
+Your app is at `http://rails-zen.<suffix>`, and the swagger login is the same as below.
+
+```
+heighliner show http-suffix    # Print the <suffix> for your machine
+```
+
+Other useful commands
+
+```
+heighliner logs                       # Watch the app logs
+```
+
+```
+heighliner login bundle exec rspec    # Run tests
+```
+
+```
+heighliner login sh                   # Shell into the app container
+```
+
+```
+heighliner db_reset                   # Put the database back to freshly seeded
+```
+
+```
+heighliner db_save my-snapshot        # Save the database
+heighliner db_load my-snapshot        # Load it back
+```
+
+Snapshots are kept per git branch.
+
+`heighliner down` stops everything and **deletes the database**. To restart, just run `heighliner up` again. Take a `db_save` first if you have data you care about.
+
 ## Important ENV Vars
 
 These are ENV vars you can pass to your server when you start up the server that set up its behavior.
