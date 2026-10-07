@@ -208,6 +208,74 @@ jobs:
             bundler-audit version
       - run: bundler-audit
 
+  osv-scanner:
+    docker:
+      - image: cimg/ruby:3.4.10-node
+    steps:
+      - checkout
+      - run:
+          name: install osv-scanner
+          command: |
+            curl -fsSL https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64 -o ~/osv-scanner
+            echo "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108  $HOME/osv-scanner" | sha256sum -c
+            chmod +x ~/osv-scanner
+            sudo mv ~/osv-scanner /usr/local/bin/osv-scanner
+            osv-scanner --version
+      - run: osv-scanner scan source -L Gemfile.lock
+
+  # Image scanners: scan the built Docker image (Alpine packages and installed
+  # gems). Pinned releases are at least a week old when adopted, and checked
+  # against their published SHA-256.
+  grype:
+    parameters:
+      dockerfile:
+        type: string
+    docker:
+      - image: cimg/ruby:3.4.10-node
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: docker29
+      - run:
+          name: install grype
+          command: |
+            curl -fsSL https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_linux_amd64.tar.gz -o ~/grype.tar.gz
+            echo "3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b  $HOME/grype.tar.gz" | sha256sum -c
+            tar -xzf ~/grype.tar.gz -C ~ grype
+            sudo mv ~/grype /usr/local/bin/grype
+            grype version
+      - run:
+          name: build image
+          command: |
+            docker build -f << parameters.dockerfile >> -t rails-zen:scan .
+            docker save rails-zen:scan -o /tmp/image.tar
+      - run: grype docker-archive:/tmp/image.tar --only-fixed --fail-on high
+
+  trivy:
+    parameters:
+      dockerfile:
+        type: string
+    docker:
+      - image: cimg/ruby:3.4.10-node
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: docker29
+      - run:
+          name: install trivy
+          command: |
+            curl -fsSL https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz -o ~/trivy.tar.gz
+            echo "2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a  $HOME/trivy.tar.gz" | sha256sum -c
+            tar -xzf ~/trivy.tar.gz -C ~ trivy
+            sudo mv ~/trivy /usr/local/bin/trivy
+            trivy --version
+      - run:
+          name: build image
+          command: |
+            docker build -f << parameters.dockerfile >> -t rails-zen:scan .
+            docker save rails-zen:scan -o /tmp/image.tar
+      - run: trivy image --input /tmp/image.tar --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 --ignorefile .trivyignore.yaml
+
   rubocop:
     docker:
       - image: cimg/ruby:3.4.10-node
@@ -245,6 +313,19 @@ workflows:
       - build-unit
       - brakeman
       - bundler-audit
+      - osv-scanner
+      - grype:
+          name: grype-app
+          dockerfile: Dockerfile
+      - grype:
+          name: grype-unit
+          dockerfile: docker/unit/Dockerfile
+      - trivy:
+          name: trivy-app
+          dockerfile: Dockerfile
+      - trivy:
+          name: trivy-unit
+          dockerfile: docker/unit/Dockerfile
       - rubocop:
           filters:
             branches:

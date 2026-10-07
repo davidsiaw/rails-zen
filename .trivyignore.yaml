@@ -1,0 +1,8 @@
+# Trivy ignore rules, used by the trivy-* CircleCI jobs (--ignorefile).
+# Only add entries for findings confirmed not to apply, and say why.
+secrets:
+  # Self-signed test certificate key shipped inside the capybara gem's own
+  # spec fixtures. Not ours and not used at runtime.
+  - id: private-key
+    paths:
+      - "/usr/local/bundle/gems/capybara-*/spec/fixtures/key.pem"

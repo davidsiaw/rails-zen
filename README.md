@@ -22,6 +22,7 @@ This skeleton allows you to achieve zen with Rails.
 - Comes with a nice docker compose that sets up a dev environment that you can use immediately
 - Devise for swagger and sidekiq dashboards (and everything else you want)
 - Pre-prepared browser test suite
+- Scans gems and docker images for vulnerabilities on every push
 - No more sprockets!
 
 ## Getting Started
@@ -89,6 +90,23 @@ Rails Zen also runs inside a single container where redis and postgres also run.
 ```
 docker-compose -f docker-compose.unit.yml up -d # Start
 ```
+
+## Vulnerability scanning
+
+Circle CI scans for known vulnerabilities on every push. None of these need an account.
+
+|   | Scans |
+|---|---|
+| bundler-audit | `Gemfile.lock` |
+| [osv-scanner](https://github.com/google/osv-scanner) | `Gemfile.lock` |
+| [grype](https://github.com/anchore/grype) | `Dockerfile` and `docker/unit/Dockerfile` images |
+| [trivy](https://github.com/aquasecurity/trivy) | `Dockerfile` and `docker/unit/Dockerfile` images, plus secrets left in them |
+
+The image scanners fail on HIGH or CRITICAL issues that have a fix available.
+
+Scanner versions are pinned in `.circleci/config.yml` with a SHA-256 checksum. When bumping, pick a release that has been out for at least a week and update the checksum too.
+
+If trivy flags something that does not apply, add it to `.trivyignore.yaml` with a comment saying why.
 
 ## My project is not called Rails Zen
 
