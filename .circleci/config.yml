@@ -227,6 +227,9 @@ jobs:
   # gems). Pinned releases are at least a week old when adopted, and checked
   # against their published SHA-256.
   grype:
+    parameters:
+      dockerfile:
+        type: string
     docker:
       - image: cimg/ruby:3.4.10-node
     steps:
@@ -244,11 +247,14 @@ jobs:
       - run:
           name: build image
           command: |
-            docker build -t rails-zen:scan .
+            docker build -f << parameters.dockerfile >> -t rails-zen:scan .
             docker save rails-zen:scan -o /tmp/image.tar
       - run: grype docker-archive:/tmp/image.tar --only-fixed --fail-on high
 
   trivy:
+    parameters:
+      dockerfile:
+        type: string
     docker:
       - image: cimg/ruby:3.4.10-node
     steps:
@@ -266,7 +272,7 @@ jobs:
       - run:
           name: build image
           command: |
-            docker build -t rails-zen:scan .
+            docker build -f << parameters.dockerfile >> -t rails-zen:scan .
             docker save rails-zen:scan -o /tmp/image.tar
       - run: trivy image --input /tmp/image.tar --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1
 
@@ -308,8 +314,18 @@ workflows:
       - brakeman
       - bundler-audit
       - osv-scanner
-      - grype
-      - trivy
+      - grype:
+          name: grype-app
+          dockerfile: Dockerfile
+      - grype:
+          name: grype-unit
+          dockerfile: docker/unit/Dockerfile
+      - trivy:
+          name: trivy-app
+          dockerfile: Dockerfile
+      - trivy:
+          name: trivy-unit
+          dockerfile: docker/unit/Dockerfile
       - rubocop:
           filters:
             branches:
