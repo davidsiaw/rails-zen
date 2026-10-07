@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Api Generator
-# rubocop:disable Metrics/ClassLength
+# rubocop:disable-next Metrics/ClassLength
 class ApiGenerator < Rails::Generators::Base
   source_root File.expand_path('templates', __dir__)
   argument :resource_name, type: :string
@@ -141,4 +141,3 @@ class ApiGenerator < Rails::Generators::Base
     File.binwrite(main_api_path, result)
   end
 end
-# rubocop:enable Metrics/ClassLength
