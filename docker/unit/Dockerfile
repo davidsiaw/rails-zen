@@ -3,7 +3,7 @@ FROM ruby:3.4-alpine
 ARG PUID=1000
 ARG PGID=1000
 
-RUN apk --update add build-base git file less postgresql-dev nodejs tzdata curl rust cargo postgresql postgresql-contrib redis yaml-dev linux-headers && \
+RUN apk --update add build-base git file less libpq-dev nodejs tzdata curl rust cargo postgresql postgresql-contrib redis yaml-dev linux-headers && \
   gem install foreman && \
   addgroup -g ${PGID} srv && \
     adduser -D -u ${PUID} -G srv srv && \
