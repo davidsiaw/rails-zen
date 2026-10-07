@@ -223,10 +223,10 @@ jobs:
             osv-scanner --version
       - run: osv-scanner scan source -L Gemfile.lock
 
-  # Scans the built Docker image (Alpine packages and installed gems) with two
-  # scanners. Pinned releases are at least a week old when adopted, and checked
+  # Image scanners: scan the built Docker image (Alpine packages and installed
+  # gems). Pinned releases are at least a week old when adopted, and checked
   # against their published SHA-256.
-  image-scan:
+  grype:
     docker:
       - image: cimg/ruby:3.4.10-node
     steps:
@@ -234,14 +234,30 @@ jobs:
       - setup_remote_docker:
           version: docker29
       - run:
-          name: install grype and trivy
+          name: install grype
           command: |
             curl -fsSL https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_linux_amd64.tar.gz -o ~/grype.tar.gz
             echo "3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b  $HOME/grype.tar.gz" | sha256sum -c
             tar -xzf ~/grype.tar.gz -C ~ grype
             sudo mv ~/grype /usr/local/bin/grype
             grype version
+      - run:
+          name: build image
+          command: |
+            docker build -t rails-zen:scan .
+            docker save rails-zen:scan -o /tmp/image.tar
+      - run: grype docker-archive:/tmp/image.tar --only-fixed --fail-on high
 
+  trivy:
+    docker:
+      - image: cimg/ruby:3.4.10-node
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: docker29
+      - run:
+          name: install trivy
+          command: |
             curl -fsSL https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz -o ~/trivy.tar.gz
             echo "2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a  $HOME/trivy.tar.gz" | sha256sum -c
             tar -xzf ~/trivy.tar.gz -C ~ trivy
@@ -252,13 +268,7 @@ jobs:
           command: |
             docker build -t rails-zen:scan .
             docker save rails-zen:scan -o /tmp/image.tar
-      - run:
-          name: grype
-          command: grype docker-archive:/tmp/image.tar --only-fixed --fail-on high
-      - run:
-          name: trivy
-          when: always
-          command: trivy image --input /tmp/image.tar --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1
+      - run: trivy image --input /tmp/image.tar --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1
 
   rubocop:
     docker:
@@ -298,7 +308,8 @@ workflows:
       - brakeman
       - bundler-audit
       - osv-scanner
-      - image-scan
+      - grype
+      - trivy
       - rubocop:
           filters:
             branches:
