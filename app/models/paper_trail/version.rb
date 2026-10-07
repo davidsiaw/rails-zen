@@ -7,6 +7,6 @@ module PaperTrail
     include ULID::Rails
 
     ulid :id
-    ulid :item_id
+    ulid :item_id, primary_key: false
   end
 end
