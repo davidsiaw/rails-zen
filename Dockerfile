@@ -39,9 +39,8 @@ EXPOSE 3000
 
 ENV RAILS_ENV=development
 
-HEALTHCHECK --interval=1m \
-            --timeout=3s \
-            --start-period=20s \
-  CMD curl -f http://localhost:3000/api/v1/health || exit 1
+# No image-level healthcheck: this image also runs sidekiq and rails_startup,
+# which don't serve HTTP. docker-compose.yml defines the rails healthcheck.
+HEALTHCHECK NONE
 
 CMD ["sh", "-c", "rails s -u falcon -b 0.0.0.0 -p 3000"]
