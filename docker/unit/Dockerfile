@@ -3,7 +3,7 @@ FROM ruby:3.4-alpine
 ARG PUID=1000
 ARG PGID=1000
 
-RUN apk --update upgrade && apk add build-base git file less libpq-dev nodejs tzdata curl rust cargo postgresql postgresql-contrib redis yaml-dev linux-headers && \
+RUN apk upgrade --no-cache && apk add --no-cache build-base git file less libpq-dev nodejs tzdata curl rust cargo postgresql postgresql-contrib redis yaml-dev linux-headers && \
   gem install foreman && \
   addgroup -g ${PGID} srv && \
     adduser -D -u ${PUID} -G srv srv && \
@@ -15,23 +15,23 @@ RUN apk --update upgrade && apk add build-base git file less libpq-dev nodejs tz
     # cargo install && \
     mkdir -p /srv/tmp
 
-ADD Gemfile Gemfile.lock Rakefile package.json .rspec .rubocop.yml .rubocop_todo.yml config.ru /srv/
+COPY Gemfile Gemfile.lock Rakefile package.json .rspec .rubocop.yml .rubocop_todo.yml config.ru /srv/
 
 WORKDIR /srv
 
 RUN bundle
 
-ADD --chown=srv:srv log /srv/log
-ADD --chown=srv:srv public /srv/public
-ADD --chown=srv:srv vendor /srv/vendor
-ADD --chown=srv:srv bin /srv/bin
-ADD --chown=srv:srv lib /srv/lib
-ADD --chown=srv:srv db /srv/db
-ADD --chown=srv:srv config /srv/config
-ADD --chown=srv:srv spec /srv/spec
-ADD --chown=srv:srv app /srv/app
+COPY --chown=srv:srv log /srv/log
+COPY --chown=srv:srv public /srv/public
+COPY --chown=srv:srv vendor /srv/vendor
+COPY --chown=srv:srv bin /srv/bin
+COPY --chown=srv:srv lib /srv/lib
+COPY --chown=srv:srv db /srv/db
+COPY --chown=srv:srv config /srv/config
+COPY --chown=srv:srv spec /srv/spec
+COPY --chown=srv:srv app /srv/app
 
-ADD --chown=srv:srv docker/unit/start.sh docker/unit/waitpg.sh docker/unit/waitredis.sh docker/unit/Procfile /srv/
+COPY --chown=srv:srv docker/unit/start.sh docker/unit/waitpg.sh docker/unit/waitredis.sh docker/unit/Procfile /srv/
 
 RUN mkdir -p /run/redis && \
     mkdir -p /run/postgresql && \
