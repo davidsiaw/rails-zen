@@ -16,7 +16,9 @@ services:
   # If you have a VNC client, simply login to port 5900 with the
   # password: secret
   chrome:
-    image: selenium/standalone-chrome
+    # Pinned: Chrome 158 rejects the '*' origin Capybara 3.40 passes to
+    # Storage.clearDataForOrigin on reset!. Unpin once teamcapybara/capybara#2865 ships.
+    image: selenium/standalone-chrome:157.0
     container_name: chrome
     environment:
       SCREEN_WIDTH: 1280
